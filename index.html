@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Bedroom Window</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- CSS custom -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="h-screen w-screen overflow-hidden">
+
+  <!-- Background -->
+  <div class="bg-container"></div>
+
+  <!-- Overlay (escurecimento) -->
+  <div class="overlay"></div>
+
+  <!-- Conteúdo -->
+  <main class="relative z-10 flex flex-col items-center justify-center h-full text-center">
+
+    <!-- Título -->
+    <h1 class="title mb-12">
+      BEDROOM WINDOW
+    </h1>
+
+    <!-- Botões -->
+    <div class="flex flex-col gap-6 w-64">
+
+      <a href="game.html" class="menu-btn">
+        INICIAR
+      </a>
+
+      <a href="tutorial.html" class="menu-btn">
+        TUTORIAL
+      </a>
+
+      <a href="historia.html" class="menu-btn">
+        HISTÓRIA
+      </a>
+
+      <button onclick="exitGame()" class="menu-btn">
+        SAIR
+      </button>
+
+    </div>
+  </main>
+
+  <script>
+    function exitGame() {
+      alert("Função de sair (em jogos reais fecha aplicação ou volta ao launcher)");
+    }
+  </script>
+
+</body>
+</html>

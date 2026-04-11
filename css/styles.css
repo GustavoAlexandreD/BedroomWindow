@@ -1,0 +1,63 @@
+/* Fonte custom */
+@font-face {
+  font-family: 'Eater';
+  src: url('../assets/fonts/Eater-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Reset leve */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Background */
+.bg-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: url('../assets/Images/backgroundMenu.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Overlay escuro */
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* Título */
+.title {
+  font-family: 'Eater', serif;
+  font-size: 4rem;
+  color: white;
+  letter-spacing: 6px;
+  text-shadow: 
+    0 0 5px rgba(255,255,255,0.2),
+    0 0 15px rgba(255,255,255,0.1),
+    0 0 30px rgba(255,255,255,0.05);
+}
+/* Botões */
+.menu-btn {
+  display: block;
+  padding: 12px;
+  background: black;
+  color: white;
+  text-decoration: none;
+  font-family: 'Eater', serif; /* 🔥 corrigido aqui */
+  letter-spacing: 2px;
+  border: 1px solid #333;
+  transition: all 0.3s ease;
+}
+
+.menu-btn:hover {
+  background: #111;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
