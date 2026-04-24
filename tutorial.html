@@ -9,6 +9,9 @@
 </head>
 
 <body class="h-screen flex items-center justify-center bg-black text-white">
+  <audio id="bgMusic" loop>
+    <source src="assets/audio/musiclfiles-mysterious-cinematic-background-123833.mp3" type="audio/mpeg">
+  </audio>
 
   <div class="text-center">
     <h1 class="title mb-6">TUTORIAL</h1>
@@ -21,6 +24,25 @@
       VOLTAR
     </a>
   </div>
+  <script>
+    const music = document.getElementById('bgMusic');
+  
+    function startMusic() {
+      if (music.paused) {
+        music.play()
+          .then(() => {
+            console.log("Música tocando!");
+          })
+          .catch(err => {
+            console.log("Erro ao tocar:", err);
+          });
+      }
+    }
+  
+    // Garante interação válida
+    document.addEventListener('click', startMusic);
+    document.addEventListener('keydown', startMusic);
+  </script>
 
 </body>
 </html>
