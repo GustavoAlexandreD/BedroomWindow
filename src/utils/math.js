@@ -42,6 +42,7 @@ export function dot(a, b) {
 
 export function normalize(v) {
     const len = Math.hypot(v[0], v[1], v[2]);
+    if (len === 0) return [0, 0, 0];
     return [v[0]/len, v[1]/len, v[2]/len];
 }
 
