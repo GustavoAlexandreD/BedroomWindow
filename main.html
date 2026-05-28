@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bedroom Window - Jogo</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+    #glcanvas1 { width: 100vw; height: 100vh; display: block; }
+  </style>
+</head>
+<body>
+  <canvas id="glcanvas1" width="1280" height="720"></canvas>
+
+  <script id="vertex-shader" type="x-shader/x-vertex">
+    attribute vec3 position;
+    attribute vec3 normal;
+    attribute vec2 texCoord;
+
+    uniform mat4 projection;
+    uniform mat4 view;
+    uniform mat4 transf;
+
+    varying vec3 v_normal;
+    varying vec3 v_fragPosition;
+    varying vec2 v_texCoord;
+
+    void main() {
+      vec4 worldPosition = transf * vec4(position, 1.0);
+      gl_Position = projection * view * worldPosition;
+      v_fragPosition = worldPosition.xyz;
+      v_normal = normalize((transf * vec4(normal, 0.0)).xyz);
+      v_texCoord = texCoord;
+    }
+  </script>
+
+  <script id="frag-shader" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec3 v_normal;
+    varying vec3 v_fragPosition;
+    varying vec2 v_texCoord;
+
+    uniform vec3 u_lightPosStatic;
+    uniform vec3 u_lightPosDynamic;
+    uniform vec3 u_lightColorDynamic;
+    uniform vec3 u_viewPosition;
+    uniform int u_useTexture;
+    uniform vec4 u_color;
+    uniform sampler2D tex;
+
+    void main() {
+      vec3 normal = normalize(v_normal);
+      vec3 lightDir1 = normalize(u_lightPosStatic - v_fragPosition);
+      vec3 lightDir2 = normalize(u_lightPosDynamic - v_fragPosition);
+      float diff1 = max(dot(normal, lightDir1), 0.0);
+      float diff2 = max(dot(normal, lightDir2), 0.0);
+      vec3 diffuse = clamp((diff1 + diff2) * 0.5 * u_lightColorDynamic + vec3(0.2), 0.0, 1.0);
+      vec4 baseColor = u_useTexture == 1 ? texture2D(tex, v_texCoord) : u_color;
+      gl_FragColor = vec4(baseColor.rgb * diffuse, baseColor.a);
+    }
+  </script>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

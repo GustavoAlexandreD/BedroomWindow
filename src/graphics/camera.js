@@ -1,45 +1,88 @@
-import * as mat4 from '../utils/math.js';
+import { normalize, cross, lookat } from "../utils/math.js";
 
-export class Camera {
-    constructor(canvas) {
-        this.canvas = canvas;
+export function createCamera() {
+  return {
+    position: [0, 5, 100], 
+    yaw: 0,               
+    pitch: 0,             
+    speed: 20.0,
+    sensitivity: 0.003
+  };
+}
 
-        this.position = new Float32Array([0, 1.6, 3]); // altura tipo player
-        this.front = new Float32Array([0, 0, -1]);
-        this.up = new Float32Array([0, 1, 0]);
+function getForward(camera) {
+  return normalize([
+    Math.sin(camera.yaw) * Math.cos(camera.pitch),
+    Math.sin(camera.pitch),
+   -Math.cos(camera.yaw) * Math.cos(camera.pitch)
+  ]);
+}
 
-        this.yaw = -90;
-        this.pitch = 0;
-    }
+function getRight(camera) {
+  return normalize(
+    cross(getForward(camera), [0, 1, 0])
+  );
+}
 
-    updateRotation(deltaYaw, deltaPitch) {
-        this.yaw += deltaYaw;
-        this.pitch += deltaPitch;
+export function updateCameraMovement(camera, input, deltaTime) {
+  const velocity = camera.speed * deltaTime;
 
-        // trava o pitch (evita virar de cabeça pra baixo)
-        this.pitch = Math.max(-89, Math.min(89, this.pitch));
+  const moveForward = [Math.sin(camera.yaw), 0, -Math.cos(camera.yaw)];
+  const moveRight = [Math.cos(camera.yaw), 0, Math.sin(camera.yaw)];
 
-        this._updateVectors();
-    }
+  // 1. Criamos uma cópia da posição atual para calcular o próximo passo
+  let nextPos = [...camera.position];
 
-    _updateVectors() {
-        const radYaw = (this.yaw * Math.PI) / 180;
-        const radPitch = (this.pitch * Math.PI) / 180;
+  if (input.forward) {
+    nextPos[0] += moveForward[0] * velocity;
+    nextPos[2] += moveForward[2] * velocity;
+  }
+  if (input.backward) {
+    nextPos[0] -= moveForward[0] * velocity;
+    nextPos[2] -= moveForward[2] * velocity;
+  }
+  if (input.left) {
+    nextPos[0] -= moveRight[0] * velocity;
+    nextPos[2] -= moveRight[2] * velocity;
+  }
+  if (input.right) {
+    nextPos[0] += moveRight[0] * velocity;
+    nextPos[2] += moveRight[2] * velocity;
+  }
+  const margin = 1.5;
+  const wallLimitX = 60.0 - margin;
+  const wallLimitZ = 60.0 - margin;
 
-        const x = Math.cos(radYaw) * Math.cos(radPitch);
-        const y = Math.sin(radPitch);
-        const z = Math.sin(radYaw) * Math.cos(radPitch);
+  if (nextPos[0] > wallLimitX) nextPos[0] = wallLimitX;
+  if (nextPos[0] < -wallLimitX) nextPos[0] = -wallLimitX;
 
-        this.front = mat4.normalize([x, y, z]);
-    }
+  if (nextPos[2] > wallLimitZ) nextPos[2] = wallLimitZ;
+  if (nextPos[2] < -wallLimitZ) nextPos[2] = -wallLimitZ;
 
-    getViewMatrix() {
-        const target = [
-            this.position[0] + this.front[0],
-            this.position[1] + this.front[1],
-            this.position[2] + this.front[2]
-        ];
+  camera.position[0] = nextPos[0];
+  camera.position[2] = nextPos[2];
+}
 
-        return mat4.createCamera(this.position, target, this.up);
-    }
+export function updateCameraLook(camera, dx, dy) {
+  camera.yaw   += dx * camera.sensitivity;
+  camera.pitch -= dy * camera.sensitivity;
+
+  // evita virar a cabeça 360° pra cima
+  const limit = Math.PI / 2 - 0.01;
+  camera.pitch = Math.max(-limit, Math.min(limit, camera.pitch));
+}
+
+export function getViewMatrix(camera) {
+  const forward = getForward(camera);
+  const target = [
+    camera.position[0] + forward[0],
+    camera.position[1] + forward[1],
+    camera.position[2] + forward[2]
+  ];
+
+  return lookat(
+    camera.position,
+    target,
+    [0, 1, 0]
+  );
 }
