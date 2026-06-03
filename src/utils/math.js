@@ -19,12 +19,13 @@ export function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
 
 export function multiply(a, b) {
     var c = new Float32Array(16);
-    for (var i = 0; i < 4; i++) {
-        for (var j = 0; j < 4; j++) {
-            c[i * 4 + j] = a[i * 4 + 0] * b[0 * 4 + j] +
-                a[i * 4 + 1] * b[1 * 4 + j] +
-                a[i * 4 + 2] * b[2 * 4 + j] +
-                a[i * 4 + 3] * b[3 * 4 + j];
+    for (var j = 0; j < 4; j++) {
+        for (var i = 0; i < 4; i++) {
+            c[i + j * 4] =
+                a[i + 0 * 4] * b[0 + j * 4] +
+                a[i + 1 * 4] * b[1 + j * 4] +
+                a[i + 2 * 4] * b[2 + j * 4] +
+                a[i + 3 * 4] * b[3 + j * 4];
         }
     }
     return c;

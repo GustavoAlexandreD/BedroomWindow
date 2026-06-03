@@ -1,17 +1,12 @@
 // main.js
 import * as Utils from "./utils/webgl_utils.js";
-import { createRenderable } from "./graphics/renderer.js";
 import * as Math3D from "./utils/math.js";
-import { createRoom } from "./graphics/room.js";
+import { Room } from "./graphics/room.js";
 import { createOutsideScenario } from "./graphics/outside_scenario.js";
 import { createCamera, updateCameraMovement, updateCameraLook, getViewMatrix } from "./graphics/camera.js";
 
 let gl, prog, lightProg;
 let sceneObjects = [];
-let angle = 0;
-let sunSpeed = 0;
-let cont = 0;
-// let bgMusic;
 // Câmera
 let camera;
 let lastTime = 0;
@@ -26,7 +21,8 @@ const input = {
 
 const models = ["assets/models/lua.obj", "assets/models/cama.obj", "assets/models/mesa_cabeceira.obj", "assets/models/relogio_parede.obj", "assets/models/blob_sorrateiro.obj", "assets/models/glob_rastejante.obj", "assets/models/grub_batedor.obj", "assets/fake_gato.obj"];
 const texSrc = ["assets/textures/wood_table_disp_4k.png", "assets/textures/grama.jpg"];
-const dynamicLightColor = [0.12, 0.36, 1.0]; // Ajuste aqui para mudar a cor da luz
+const dynamicLightColor = [1.0, 0.68, 0.26]; // Ajuste aqui para mudar a cor da luz
+const playerLightRadius = 50.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
 
 async function init() {
   const loadedImages = await Promise.all(
@@ -41,19 +37,121 @@ async function init() {
 
   camera = createCamera();
 
-  const modelParsers = [];
-  const textureLibrary = loadedImages.map(img =>
-    Utils.createWebGLTexture(gl, img)
-  );
   const roomTexture = Utils.createWebGLTexture(gl, roomImg);
   const outsideTexture = Utils.createWebGLTexture(gl, outsideImg);
 
-  // Quarto
-  const room = createRoom(gl);
-  room.isLightSource = false;
-  room.transform.y = -15;
-  room.texture = roomTexture;
-  sceneObjects.push(room);
+  // Quartos
+  const roomInstance1 = new Room([0,0,0], [0,0], [0,0], [0,0], [2,2]);
+  const room1 = roomInstance1.createRoom(gl);
+  room1.isLightSource = false;
+  room1.transform.y = -15;
+  room1.texture = roomTexture;
+  sceneObjects.push(room1);
+
+  const roomInstance2 = new Room([-125,0,0], [1,0], [0,0], [2,2], [2,3]);
+  const room2 = roomInstance2.createRoom(gl);
+  room2.isLightSource = false;
+  room2.transform.y = -15;
+  room2.texture = roomTexture;
+  sceneObjects.push(room2);
+
+  const roomInstance3 = new Room([-250,0,0], [2,2], [0,0], [2,3], [1,0]);
+  const room3 = roomInstance3.createRoom(gl);
+  room3.isLightSource = false;
+  room3.transform.y = -15;
+  room3.texture = roomTexture;
+  sceneObjects.push(room3);
+
+  const roomInstance4 = new Room([-375,0,0], [1,0], [0,0], [1,0], [0,0]);
+  const room4 = roomInstance4.createRoom(gl);
+  room4.isLightSource = false;
+  room4.transform.y = -15;
+  room4.texture = roomTexture;
+  sceneObjects.push(room4);
+
+  const roomInstance5 = new Room([0,0,-125], [2,3], [0,0], [0,0], [1,0]);
+  const room5 = roomInstance5.createRoom(gl);
+  room5.isLightSource = false;
+  room5.transform.y = -15;
+  room5.texture = roomTexture;
+  sceneObjects.push(room5);
+  
+  const roomInstance6 = new Room([-125,0,-125], [0,0], [1,0], [1,0], [2,3]);
+  const room6 = roomInstance6.createRoom(gl);
+  room6.isLightSource = false;
+  room6.transform.y = -15;
+  room6.texture = roomTexture;
+  sceneObjects.push(room6);
+
+  const roomInstance7 = new Room([-250,0,-125], [1,0], [2,2], [2,3], [0,0]);
+  const room7 = roomInstance7.createRoom(gl);
+  room7.isLightSource = false;
+  room7.transform.y = -15;
+  room7.texture = roomTexture;
+  sceneObjects.push(room7);
+
+  const roomInstance8 = new Room([-375,0,-125], [0,0], [1,0], [0,0], [0,0]);
+  const room8 = roomInstance8.createRoom(gl);
+  room8.isLightSource = false;
+  room8.transform.y = -15;
+  room8.texture = roomTexture;
+  sceneObjects.push(room8);
+
+   const roomInstance9 = new Room([0,0,-250], [1,0], [2,3], [0,0], [0,0]);
+  const room9 = roomInstance9.createRoom(gl);
+  room9.isLightSource = false;
+  room9.transform.y = -15;
+  room9.texture = roomTexture;
+  sceneObjects.push(room9);
+
+  const roomInstance10 = new Room([-125,0,-250], [1,0], [0,0], [0,0], [0,0]);
+  const room10 = roomInstance10.createRoom(gl);
+  room10.isLightSource = false;
+  room10.transform.y = -15;
+  room10.texture = roomTexture;
+  sceneObjects.push(room10);
+
+  const roomInstance11 = new Room([-250,0,-250], [0,0], [1,0], [0,0], [2,2]);
+  const room11 = roomInstance11.createRoom(gl);
+  room11.isLightSource = false;
+  room11.transform.y = -15;
+  room11.texture = roomTexture;
+  sceneObjects.push(room11);
+
+  const roomInstance12 = new Room([-375,0,-250], [1,0], [0,0], [2,2], [0,0]);
+  const room12 = roomInstance12.createRoom(gl);
+  room12.isLightSource = false;
+  room12.transform.y = -15;
+  room12.texture = roomTexture;
+  sceneObjects.push(room12);
+
+  const roomInstance13 = new Room([0,0,-375], [0,0], [1,0], [0,0], [1,0]);
+  const room13 = roomInstance13.createRoom(gl);
+  room13.isLightSource = false;
+  room13.transform.y = -15;
+  room13.texture = roomTexture;
+  sceneObjects.push(room13);
+  
+  const roomInstance14 = new Room([-125,0,-375], [0,0], [1,0], [1,0], [0,0]);
+  const room14 = roomInstance14.createRoom(gl);
+  room14.isLightSource = false;
+  room14.transform.y = -15;
+  room14.texture = roomTexture;
+  sceneObjects.push(room14);
+
+  const roomInstance15 = new Room([-250,0,-375], [2,3], [0,0], [0,0], [1,0]);
+  const room15 = roomInstance15.createRoom(gl);
+  room15.isLightSource = false;
+  room15.transform.y = -15;
+  room15.texture = roomTexture;
+  sceneObjects.push(room15);
+
+  const roomInstance16 = new Room([-375,0,-375], [0,0], [1,0], [1,0], [0,0]);
+  const room16 = roomInstance16.createRoom(gl);
+  room16.isLightSource = false;
+  room16.transform.y = -15;
+  room16.texture = roomTexture;
+  sceneObjects.push(room16);
 
   // Cenário externo
   const outside = createOutsideScenario(gl);
@@ -92,7 +190,7 @@ function initGL() {
   lightProg = Utils.createProgram(gl, vShader, lfShader);
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  gl.clearColor(0.02, 0.05, 0.15, 1.0);
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.enable(gl.DEPTH_TEST);
 }
 
@@ -103,10 +201,6 @@ function setupInput() {
 
   canvas.onclick = () => {
     canvas.requestPointerLock();
-
-    // if (bgMusic && bgMusic.paused) {
-    //   bgMusic.play().catch(e => console.error("Erro ao reproduzir áudio:", e));
-    // }
   };
 
   document.addEventListener("mousemove", e => {
@@ -135,29 +229,11 @@ function draw(time = 0) {
   lastTime = time;
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  angle++;
-  cont++;
-  if(sunSpeed < 15 && cont == 200){
-    sunSpeed++;
-    cont = 0;
-  }else{
-    if(sunSpeed == 15){
-      cont = 0;
-    }
-  }
-
   updateCameraMovement(camera, input, deltaTime);
 
   const aspect = gl.canvas.width / gl.canvas.height;
   const projection = Math3D.createPerspective(60, aspect, 0.5, 2000);
   const view = getViewMatrix(camera);
-
-  const radius = 100.0; // Distância da lua à origem
-  const speedFactor = 0.015; // movimento mais lento
-  const sunAngle = Math.sqrt(angle * sunSpeed) * speedFactor;
-  const lx = Math.cos(sunAngle) * radius;
-  const ly = Math.sin(sunAngle) * radius;
-  const lz = 0;
 
   sceneObjects.forEach((obj, index) => {
     const program = obj.isLightSource ? lightProg : prog;
@@ -194,9 +270,17 @@ function draw(time = 0) {
         gl.getUniformLocation(program, "u_lightPosStatic"),
         20, 50, 40
       );
+      // Use a posição do jogador/câmera como fonte de luz dinâmica
       gl.uniform3f(
         gl.getUniformLocation(program, "u_lightPosDynamic"),
-        lx, ly, lz
+        camera.position[0],
+        camera.position[1],
+        camera.position[2]
+      );
+      // Envia o raio da luz do jogador
+      gl.uniform1f(
+        gl.getUniformLocation(program, "u_lightRadius"),
+        playerLightRadius
       );
       gl.uniform3f(
         gl.getUniformLocation(program, "u_lightColorDynamic"),
@@ -210,13 +294,6 @@ function draw(time = 0) {
         camera.position[1],
         camera.position[2]
       );
-      if(index == 5){
-        obj.transform.ry = angle * 4
-      }
-    } else {
-      obj.transform.x = lx;
-      obj.transform.y = ly;
-      obj.transform.z = lz;
     }
 
     const uUseTexLoc = gl.getUniformLocation(program, "u_useTexture");
@@ -275,7 +352,7 @@ function draw(time = 0) {
       model
     );
 
-    gl.drawArrays(gl.TRIANGLES, 0, obj.numVertices);
+      gl.drawArrays(gl.TRIANGLES, 0, obj.numVertices);
   });
 
   requestAnimationFrame(draw);

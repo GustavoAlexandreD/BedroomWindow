@@ -1,8 +1,9 @@
 import { normalize, cross, lookat } from "../utils/math.js";
 
 export function createCamera() {
+  const margin = 2.0;
   return {
-    position: [0, 5, 100], 
+    position: [0, 5, 60.0 - margin], 
     yaw: 0,               
     pitch: 0,             
     speed: 20.0,
@@ -49,15 +50,16 @@ export function updateCameraMovement(camera, input, deltaTime) {
     nextPos[0] += moveRight[0] * velocity;
     nextPos[2] += moveRight[2] * velocity;
   }
-  const margin = 1.5;
-  const wallLimitX = 60.0 - margin;
-  const wallLimitZ = 60.0 - margin;
 
-  if (nextPos[0] > wallLimitX) nextPos[0] = wallLimitX;
-  if (nextPos[0] < -wallLimitX) nextPos[0] = -wallLimitX;
+  const margin = 2.0; // margem para evitar que a câmera fique muito próxima da parede
+  const startLimit = 60.0 - margin;
+  const endLimit = -435.0 + margin;
 
-  if (nextPos[2] > wallLimitZ) nextPos[2] = wallLimitZ;
-  if (nextPos[2] < -wallLimitZ) nextPos[2] = -wallLimitZ;
+  if (nextPos[0] > startLimit) nextPos[0] = startLimit;
+  if (nextPos[0] < endLimit) nextPos[0] = endLimit;
+
+  if (nextPos[2] > startLimit) nextPos[2] = startLimit;
+  if (nextPos[2] < endLimit) nextPos[2] = endLimit;
 
   camera.position[0] = nextPos[0];
   camera.position[2] = nextPos[2];
