@@ -25,7 +25,7 @@ function getRight(camera) {
   );
 }
 
-export function updateCameraMovement(camera, input, deltaTime) {
+export function updateCameraMovement(camera, input, deltaTime, collisionSystem) {
   const velocity = camera.speed * deltaTime;
 
   const moveForward = [Math.sin(camera.yaw), 0, -Math.cos(camera.yaw)];
@@ -51,6 +51,16 @@ export function updateCameraMovement(camera, input, deltaTime) {
     nextPos[2] += moveRight[2] * velocity;
   }
 
+  // Se o sistema de colisão existir, ele filtra o nosso passo!
+  if (collisionSystem) {
+      // O tamanho físico do jogador (Largura X, Altura Y, Profundidade Z)
+      const playerSize = [5.0, 15.0, 5.0]; 
+      
+      // A função moveWithCollision impede a câmara de atravessar a mesa
+      // deslizando-a pela parede (anti-tunneling)
+      nextPos = collisionSystem.moveWithCollision(camera.position, nextPos, playerSize);
+  }
+
   const margin = 2.0; // margem para evitar que a câmera fique muito próxima da parede
   const startLimit = 60.0 - margin;
   const endLimit = -435.0 + margin;
@@ -62,6 +72,7 @@ export function updateCameraMovement(camera, input, deltaTime) {
   if (nextPos[2] < endLimit) nextPos[2] = endLimit;
 
   camera.position[0] = nextPos[0];
+  camera.position[1] = nextPos[1];
   camera.position[2] = nextPos[2];
 }
 

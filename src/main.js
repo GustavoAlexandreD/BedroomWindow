@@ -4,9 +4,16 @@ import * as Math3D from "./utils/math.js";
 import { Room } from "./graphics/room.js";
 import { createOutsideScenario } from "./graphics/outside_scenario.js";
 import { createCamera, updateCameraMovement, updateCameraLook, getViewMatrix } from "./graphics/camera.js";
+import { OBJLoader } from "./models/obj-loader.js"
+import { TextureLoader } from "./graphics/texture-loader.js"
+import { createRenderable } from "./graphics/renderer.js";
+import { Furniture } from "./entities/furniture.js"
+import { EntityManager } from "./game/entity-manager.js";
+import { CollisionSystem } from "./game/collision.js"
 
 let gl, prog, lightProg;
 let sceneObjects = [];
+let collisionSystem;
 // Câmera
 let camera;
 let lastTime = 0;
@@ -22,7 +29,7 @@ const input = {
 const models = ["assets/models/lua.obj", "assets/models/cama.obj", "assets/models/mesa_cabeceira.obj", "assets/models/relogio_parede.obj", "assets/models/blob_sorrateiro.obj", "assets/models/glob_rastejante.obj", "assets/models/grub_batedor.obj", "assets/fake_gato.obj"];
 const texSrc = ["assets/textures/wood_table_disp_4k.png", "assets/textures/grama.jpg"];
 const dynamicLightColor = [1.0, 0.68, 0.26]; // Ajuste aqui para mudar a cor da luz
-const playerLightRadius = 50.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
+const playerLightRadius = 5000.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
 
 async function init() {
   const loadedImages = await Promise.all(
@@ -161,7 +168,50 @@ async function init() {
   sceneObjects.push(outside);
 
   // Modelos OBJ
-  // ***** IMPORTANTE: Fazer a leitura dos modelos OBJ *****
+  // 1. Instancia os carregadores
+  const objLoader = new OBJLoader()
+  const textureLoader = new TextureLoader(gl)
+  const entityManager = new EntityManager()
+  
+  // 2. Carrega o modelo 3D (a lista de pontos) e a imagem (textura)
+  const mesaData = await objLoader.load("assets/models/mesa_cabeceira.obj")
+  const texturaMadeira = await textureLoader.load("assets/textures/wood_table_diff_4k.jpg")
+
+  // 3. O 'renderer.js' espera a geometria num formato específico (data.position, etc)
+  const geometriaFormatada = {
+    data: {
+      position: mesaData.vertices,
+      normal: mesaData.normals,
+      texcoord: mesaData.uvs,
+      indices: mesaData.indices
+    }
+  }
+
+  // 4. Envia os pontos para a memória da Placa de Vídeo (cria os Buffers)
+  const mesaRenderable = createRenderable(gl, geometriaFormatada)
+
+  // 5. Cria o móvel no mundo
+  const minhaMesa = new Furniture(
+    "mesa-1",
+    "Mesa de Cabeceira",
+    [0.0, 0.0, 0.0],
+    mesaRenderable,
+    texturaMadeira,
+    20.0
+  )
+
+  // 6. Adiciona ao Gerenciador para a lógica (física, atualizações)
+  entityManager.entities.push(minhaMesa);
+
+  // 7. Adiciona a malha 3D da mesa na lista de desenho da Placa de Vídeo
+  sceneObjects.push(minhaMesa.getDrawData())
+
+  // Colisões
+  // Inicia o sistema de colisão
+  collisionSystem = new CollisionSystem();
+
+  // Registra a "caixa invisível" da mesa.
+  collisionSystem.addBox([0.0, 0.0,0.0], [15.0, 20.0, 15.0])
 
   requestAnimationFrame(draw);
 }
@@ -229,7 +279,7 @@ function draw(time = 0) {
   lastTime = time;
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  updateCameraMovement(camera, input, deltaTime);
+  updateCameraMovement(camera, input, deltaTime, collisionSystem);
 
   const aspect = gl.canvas.width / gl.canvas.height;
   const projection = Math3D.createPerspective(60, aspect, 0.5, 2000);
@@ -352,7 +402,16 @@ function draw(time = 0) {
       model
     );
 
-      gl.drawArrays(gl.TRIANGLES, 0, obj.numVertices);
+      // Se tiver o buffer de índices (É um móvel ou monstro .obj)
+      if (obj.indexBuffer) {
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, obj.indexBuffer);
+          // Usa drawElements para ligar os pontos corretamente!
+          gl.drawElements(gl.TRIANGLES, obj.numIndices, gl.UNSIGNED_INT, 0);
+      } 
+      // Se não tiver índices (É o quarto/labirinto gerado por código)
+      else {
+          gl.drawArrays(gl.TRIANGLES, 0, obj.numVertices);
+      }
   });
 
   requestAnimationFrame(draw);
