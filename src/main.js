@@ -24,6 +24,67 @@ const texSrc = ["assets/textures/wood_table_disp_4k.png", "assets/textures/grama
 const dynamicLightColor = [1.0, 0.68, 0.26]; // Ajuste aqui para mudar a cor da luz
 const playerLightRadius = 50.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
 
+// Inicialiação do WebGL, shaders, programa e textura
+function initGL() {
+  const canvas = document.getElementById("glcanvas1");
+  gl = Utils.getGL(canvas);
+
+  const vtxSrc = document.getElementById("vertex-shader").text;
+  const fragSrc = document.getElementById("frag-shader").text;
+
+  const lightFragSrc = `
+    precision mediump float;
+    varying vec2 v_texCoord;
+    uniform sampler2D tex;
+    void main() {
+      gl_FragColor = texture2D(tex, v_texCoord);
+    }
+  `;
+
+  const vShader = Utils.createShader(gl, gl.VERTEX_SHADER, vtxSrc);
+  const fShader = Utils.createShader(gl, gl.FRAGMENT_SHADER, fragSrc);
+  const lfShader = Utils.createShader(gl, gl.FRAGMENT_SHADER, lightFragSrc);
+
+  prog = Utils.createProgram(gl, vShader, fShader);
+  lightProg = Utils.createProgram(gl, vShader, lfShader);
+
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.enable(gl.DEPTH_TEST);
+}
+
+// Configuração da movimentação da câmera usando mouse e teclado
+function setupInput() {
+  const canvas = gl.canvas;
+
+  canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock;
+
+  canvas.onclick = () => {
+    canvas.requestPointerLock();
+  };
+
+  document.addEventListener("mousemove", e => {
+    if (document.pointerLockElement === canvas) {
+      updateCameraLook(camera, e.movementX, e.movementY);
+    }
+  });
+
+  window.addEventListener("keydown", e => {
+    if (e.key === "w") input.forward = true;
+    if (e.key === "s") input.backward = true;
+    if (e.key === "a") input.left = true;
+    if (e.key === "d") input.right = true;
+  });
+
+  window.addEventListener("keyup", e => {
+    if (e.key === "w") input.forward = false;
+    if (e.key === "s") input.backward = false;
+    if (e.key === "a") input.left = false;
+    if (e.key === "d") input.right = false;
+  });
+}
+
+// Função de inicialização: carrega texturas, cria objetos da cena e inicia o loop de renderização
 async function init() {
   const loadedImages = await Promise.all(
     texSrc.map(url => Utils.loadImage(url))
@@ -97,7 +158,7 @@ async function init() {
   room8.texture = roomTexture;
   sceneObjects.push(room8);
 
-   const roomInstance9 = new Room([0,0,-250], [1,0], [2,3], [0,0], [0,0]);
+  const roomInstance9 = new Room([0,0,-250], [1,0], [2,3], [0,0], [0,0]);
   const room9 = roomInstance9.createRoom(gl);
   room9.isLightSource = false;
   room9.transform.y = -15;
@@ -166,64 +227,7 @@ async function init() {
   requestAnimationFrame(draw);
 }
 
-function initGL() {
-  const canvas = document.getElementById("glcanvas1");
-  gl = Utils.getGL(canvas);
-
-  const vtxSrc = document.getElementById("vertex-shader").text;
-  const fragSrc = document.getElementById("frag-shader").text;
-
-  const lightFragSrc = `
-    precision mediump float;
-    varying vec2 v_texCoord;
-    uniform sampler2D tex;
-    void main() {
-      gl_FragColor = texture2D(tex, v_texCoord);
-    }
-  `;
-
-  const vShader = Utils.createShader(gl, gl.VERTEX_SHADER, vtxSrc);
-  const fShader = Utils.createShader(gl, gl.FRAGMENT_SHADER, fragSrc);
-  const lfShader = Utils.createShader(gl, gl.FRAGMENT_SHADER, lightFragSrc);
-
-  prog = Utils.createProgram(gl, vShader, fShader);
-  lightProg = Utils.createProgram(gl, vShader, lfShader);
-
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
-  gl.enable(gl.DEPTH_TEST);
-}
-
-function setupInput() {
-  const canvas = gl.canvas;
-
-  canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock;
-
-  canvas.onclick = () => {
-    canvas.requestPointerLock();
-  };
-
-  document.addEventListener("mousemove", e => {
-    if (document.pointerLockElement === canvas) {
-      updateCameraLook(camera, e.movementX, e.movementY);
-    }
-  });
-
-  window.addEventListener("keydown", e => {
-    if (e.key === "w") input.forward = true;
-    if (e.key === "s") input.backward = true;
-    if (e.key === "a") input.left = true;
-    if (e.key === "d") input.right = true;
-  });
-
-  window.addEventListener("keyup", e => {
-    if (e.key === "w") input.forward = false;
-    if (e.key === "s") input.backward = false;
-    if (e.key === "a") input.left = false;
-    if (e.key === "d") input.right = false;
-  });
-}
-
+// Função de renderização: limpa a tela, atualiza a câmera e desenha os objetos da cena
 function draw(time = 0) {
   const deltaTime = (time - lastTime) * 0.001;
   lastTime = time;
