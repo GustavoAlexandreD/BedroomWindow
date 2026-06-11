@@ -273,4 +273,145 @@ export class Room{
         }
         return createRenderable(gl, { data: { position: positions, normal: normals, texcoord: texcoords } });
     }
+
+    createBoundBoxes(){
+        const length = 120.0; 
+        const width = 120.0; 
+        const windowHeight = 20.0;
+        const rightPosition = this.roomPosition[0] + width/2;
+        const leftPosition = this.roomPosition[0] - width/2;
+        const frontPosition = this.roomPosition[2] - length/2;
+        const backPosition = this.roomPosition[2] + length/2;
+        let windowWidth;
+        const boundBoxes = [];
+
+        for(let i=0; i<4; i++){
+            if(this.walls[i].type === 0){
+                // Parede sem janelas
+                switch(i){
+                    case 0: // Parede Frontal
+                        boundBoxes.push([[this.roomPosition[0], this.roomPosition[1], this.roomPosition[2]-60], [120.0, 50.0, 5.0]]);
+                        break;
+                    case 1: // Parede de Fundo
+                        boundBoxes.push([[this.roomPosition[0], this.roomPosition[1], this.roomPosition[2]+60], [120.0, 50.0, 5.0]]);
+                        break;
+                    case 2: // Parede Direita
+                        boundBoxes.push([[this.roomPosition[0]+60, this.roomPosition[1], this.roomPosition[2]], [5.0, 50.0, 120.0]]);
+                        break;
+                    case 3: // Parede Esquerda
+                        boundBoxes.push([[this.roomPosition[0]-60, this.roomPosition[1], this.roomPosition[2]], [5.0, 50.0, 120.0]]);
+                        break;
+                }
+            }else if(this.walls[i].type === 1){
+                let doorWidth = 20.0;
+                let wallWidth = (width - doorWidth) / 2;
+                // Parede com porta
+                switch(i){
+                    case 0: // Parede Frontal
+                        boundBoxes.push([[this.roomPosition[0], this.roomPosition[1]+32, this.roomPosition[2]-60], [120.0, 18.0, 5.0]]);
+                        var x, x1, x2;
+                        x = leftPosition;
+                        for(let j=0; j<3; j = j+2){
+                            x1 = x + wallWidth;
+                            boundBoxes.push([[x1-wallWidth/2, this.roomPosition[1], this.roomPosition[2]-60], [wallWidth, 32.0, 5.0]]);
+                            if(j+2 >= 3) continue;
+                            x2 = x1 + doorWidth;
+                            x = x2;
+                        }
+                        break;
+                    case 1: // Parede de Fundo
+                        boundBoxes.push([[this.roomPosition[0], this.roomPosition[1]+32, this.roomPosition[2]+60], [120.0, 18.0, 5.0]]);
+                        var x, x1, x2;
+                        x = leftPosition;
+                        for(let j=0; j<3; j = j+2){
+                            x1 = x + wallWidth;
+                            boundBoxes.push([[x1-wallWidth/2, this.roomPosition[1], this.roomPosition[2]+60], [wallWidth, 32.0, 5.0]]);
+                            if(j+2 >= 3) continue;
+                            x2 = x1 + doorWidth;
+                            x = x2;
+                        }
+                        break;
+                    case 2: // Parede Direita
+                        boundBoxes.push([[this.roomPosition[0]+60, this.roomPosition[1]+32, this.roomPosition[2]], [5.0, 18.0, 120.0]]);
+                        var z, z1, z2;
+                        z = frontPosition;
+                        for(let j=0; j<3; j = j+2){
+                            z1 = z + wallWidth;
+                            boundBoxes.push([[this.roomPosition[0]+60, this.roomPosition[1], z1-wallWidth/2], [5.0, 32.0, wallWidth]]);
+                            if(j+2 >= 3) continue;
+                            z2 = z1 + doorWidth;
+                            z = z2;
+                        }
+                        break;
+                    case 3: // Parede Esquerda
+                        boundBoxes.push([[this.roomPosition[0]-60, this.roomPosition[1]+32, this.roomPosition[2]], [120.0, 18.0, 5.0]]);
+                        var z, z1, z2;
+                        z = frontPosition;
+                        for(let j=0; j<3; j = j+2){
+                            z1 = z + wallWidth;
+                            boundBoxes.push([[this.roomPosition[0]-60, this.roomPosition[1], z1-wallWidth/2], [5.0, 32.0, wallWidth]]);
+                            if(j+2 >= 3) continue;
+                            z2 = z1 + doorWidth;
+                            z = z2;
+                        }
+                        break;
+                }
+            }else if(this.walls[i].type === 2){
+                // Parede com janelas
+                const quantity_of_windows = this.walls[i].windows;
+                let windowWidth = width / (2*quantity_of_windows + 1);
+                switch(i){
+                    case 0: // Parede Frontal
+                        boundBoxes.push([[this.roomPosition[0], this.roomPosition[1]+32, this.roomPosition[2]-60], [120.0, 18.0, 5.0]]);
+                        var x, x1, x2;
+                        x = leftPosition;
+                        for(let j=0; j<quantity_of_windows+1; j++){
+                            x1 = x + windowWidth;
+                            boundBoxes.push([[x1-windowWidth/2, this.roomPosition[1], this.roomPosition[2]-60], [windowWidth, 32.0, 5.0]]);
+                            if(j+1 > quantity_of_windows) break;
+                            x2 = x1 + windowWidth;
+                            x = x2;
+                        }
+                        break;
+                    case 1: // Parede de Fundo
+                        boundBoxes.push([[this.roomPosition[0], this.roomPosition[1]+32, this.roomPosition[2]+60], [120.0, 18.0, 5.0]]);
+                        var x, x1, x2;
+                        x = leftPosition;
+                        for(let j=0; j<quantity_of_windows+1; j++){
+                            x1 = x + windowWidth;
+                            boundBoxes.push([[x1-windowWidth/2, this.roomPosition[1], this.roomPosition[2]+60], [windowWidth, 32.0, 5.0]]);
+                            if(j+1 > quantity_of_windows) break;
+                            x2 = x1 + windowWidth;
+                            x = x2;
+                        }
+                        break;
+                    case 2: // Parede Direita
+                        boundBoxes.push([[this.roomPosition[0]+60, this.roomPosition[1]+32, this.roomPosition[2]], [120.0, 18.0, 5.0]]);
+                        var z, z1, z2;
+                        z = frontPosition;
+                        for(let j=0; j<quantity_of_windows+1; j++){
+                            z1 = z + windowWidth;
+                            boundBoxes.push([[this.roomPosition[0]+60, this.roomPosition[1], z1-windowWidth/2], [5.0, 32.0, windowWidth]]);
+                            if(j+1 > quantity_of_windows) break;
+                            z2 = z1 + windowWidth;
+                            z = z2;
+                        }
+                        break;
+                    case 3: // Parede Esquerda
+                        boundBoxes.push([[this.roomPosition[0]-60, this.roomPosition[1]+32, this.roomPosition[2]], [120.0, 18.0, 5.0]]);
+                        var z, z1, z2;
+                        z = frontPosition;
+                        for(let j=0; j<quantity_of_windows+1; j++){
+                            z1 = z + windowWidth;
+                            boundBoxes.push([[this.roomPosition[0]-60, this.roomPosition[1], z1-windowWidth/2], [5.0, 32.0, windowWidth]]);
+                            if(j+1 > quantity_of_windows) break;
+                            z2 = z1 + windowWidth;
+                            z = z2;
+                        }
+                        break;
+                }
+            }
+        }
+        return boundBoxes;
+    }
 }

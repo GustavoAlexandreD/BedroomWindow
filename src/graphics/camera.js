@@ -1,12 +1,12 @@
 import { normalize, cross, lookat } from "../utils/math.js";
 
 export function createCamera() {
-  const margin = 2.0;
+  const margin = 5.0;
   return {
-    position: [0, 5, 60.0 - margin], 
+    position: [0, 0, 0], 
     yaw: 0,               
     pitch: 0,             
-    speed: 20.0,
+    speed: 40.0,
     sensitivity: 0.003
   };
 }
@@ -61,7 +61,7 @@ export function updateCameraMovement(camera, input, deltaTime, collisionSystem) 
       nextPos = collisionSystem.moveWithCollision(camera.position, nextPos, playerSize);
   }
 
-  const margin = 2.0; // margem para evitar que a câmera fique muito próxima da parede
+  const margin = 5.0; // margem para evitar que a câmera fique muito próxima da parede
   const startLimit = 60.0 - margin;
   const endLimit = -435.0 + margin;
 
