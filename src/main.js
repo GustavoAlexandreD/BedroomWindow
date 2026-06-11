@@ -360,7 +360,6 @@ function draw(time = 0) {
   const deltaTime = (time - lastTime) * 0.001;
   lastTime = time;
   playerLightRadius = InitialplayerLightRadius - (time * 0.0003);
-  console.log("Posicao da camera:", camera.position[0].toFixed(2), camera.position[2].toFixed(2));
   if (camera.position[0] >= -290 && camera.position[0] <= -195 && camera.position[2] >= -430 && camera.position[2] <= -425) {
     window.location.href = "win.html";
     return;
