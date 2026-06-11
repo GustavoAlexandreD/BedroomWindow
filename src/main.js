@@ -29,8 +29,9 @@ const input = {
 
 const models = ["assets/models/lua.obj", "assets/models/cama.obj", "assets/models/mesa_cabeceira.obj", "assets/models/relogio_parede.obj", "assets/models/blob_sorrateiro.obj", "assets/models/glob_rastejante.obj", "assets/models/grub_batedor.obj", "assets/fake_gato.obj"];
 const texSrc = ["assets/textures/wood_table_disp_4k.png", "assets/textures/grama.jpg"];
-const dynamicLightColor = [1.0, 0.68, 0.26]; // Ajuste aqui para mudar a cor da luz
-const playerLightRadius = 5000.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
+const dynamicLightColor = [1.0, 0.42, 0.1]; // Ajuste aqui para mudar a cor da luz
+const InitialplayerLightRadius = 90.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
+let playerLightRadius; // Variável que será animada ao longo do tempo
 
 async function init() {
   const loadedImages = await Promise.all(
@@ -345,6 +346,17 @@ function setupInput() {
 function draw(time = 0) {
   const deltaTime = (time - lastTime) * 0.001;
   lastTime = time;
+  playerLightRadius = InitialplayerLightRadius - (time * 0.0003);
+  console.log("Posicao da camera:", camera.position[0].toFixed(2), camera.position[2].toFixed(2));
+  if (camera.position[0] >= -290 && camera.position[0] <= -195 && camera.position[2] >= -430 && camera.position[2] <= -425) {
+    window.location.href = "win.html";
+    return;
+  }
+  if (playerLightRadius <= 40.0) {
+    window.location.href = "gameOver.html";
+    return;
+  }
+  playerLightRadius = playerLightRadius - (playerLightRadius/8) * Math.sin(time * 0.001); // Anima o raio da luz do jogador para um efeito pulsante
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   updateCameraMovement(camera, input, deltaTime, collisionSystem, windowsPosition);

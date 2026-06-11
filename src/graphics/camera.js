@@ -5,7 +5,7 @@ export function createCamera() {
     position: [0, 5, 0], 
     yaw: 0,               
     pitch: 0,             
-    speed: 40.0,
+    speed: 20.0,
     sensitivity: 0.003
   };
 }
