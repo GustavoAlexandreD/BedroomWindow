@@ -1,4 +1,4 @@
-// main.js
+// Importações
 import * as Utils from "./utils/webgl_utils.js";
 import * as Math3D from "./utils/math.js";
 import { Room } from "./graphics/room.js";
@@ -11,9 +11,11 @@ import { Furniture } from "./entities/furniture.js"
 import { EntityManager } from "./game/entity-manager.js";
 import { CollisionSystem } from "./game/collision.js"
 
+//Variáveis globais
 let gl, prog, lightProg;
 let sceneObjects = [];
 let collisionSystem;
+
 // Câmera
 let camera;
 let lastTime = 0;
@@ -27,13 +29,25 @@ const input = {
   right: false
 };
 
-const models = ["assets/models/lua.obj", "assets/models/cama.obj", "assets/models/mesa_cabeceira.obj", "assets/models/relogio_parede.obj", "assets/models/blob_sorrateiro.obj", "assets/models/glob_rastejante.obj", "assets/models/grub_batedor.obj", "assets/fake_gato.obj"];
-const texSrc = ["assets/textures/wood_table_disp_4k.png", "assets/textures/grama.jpg"];
+// Luz dinâmica do jogador (Lampião)
 const dynamicLightColor = [1.0, 0.42, 0.1]; // Ajuste aqui para mudar a cor da luz
 const InitialplayerLightRadius = 90.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
 let playerLightRadius; // Variável que será animada ao longo do tempo
 
+//Modelos e texturas
+const models = ["assets/models/lua.obj", "assets/models/cama.obj", "assets/models/mesa_cabeceira.obj", "assets/models/relogio_parede.obj", "assets/models/blob_sorrateiro.obj", "assets/models/glob_rastejante.obj", "assets/models/grub_batedor.obj", "assets/fake_gato.obj"];
+const texSrc = ["assets/textures/wood_table_disp_4k.png", "assets/textures/grama.jpg"];
+
+// Função de inicialização (Carrega texturas, modelos, configura a cena, etc)
 async function init() {
+
+  // Configura o WebGL (contexto, shaders, etc)
+  initGL();
+
+  // Configura o input do jogador (mouse e teclado)
+  setupInput();
+
+  // Carrega as texturas necessárias para a cena
   const loadedImages = await Promise.all(
     texSrc.map(url => Utils.loadImage(url))
   );
@@ -41,23 +55,16 @@ async function init() {
   const roomImg = await Utils.loadImage("assets/textures/dark-grunge-texture.jpg");
   const outsideImg = await Utils.loadImage("assets/textures/grama.jpg");
 
-  initGL();
-  setupInput();
-
-  camera = createCamera();
-  windowsPosition = [];
-
   const roomTexture = Utils.createWebGLTexture(gl, roomImg);
   const outsideTexture = Utils.createWebGLTexture(gl, outsideImg);
 
-  // Colisões
+  // Configura a cena (Câmera, objetos, colisões, etc)
+  camera = createCamera();
+
   // Inicia o sistema de colisão
   collisionSystem = new CollisionSystem();
 
-  // Registra a "caixa invisível" da mesa.
-  collisionSystem.addBox([0.0, 0.0, -60.0], [15.0, 20.0, 15.0])
-
-  // Quartos
+  // Quartos (Desenho por código + caixas de colisão)
   const roomInstance1 = new Room([0,0,0], [0,0], [0,0], [0,0], [2,2]);
   const room1 = roomInstance1.createRoom(gl);
   const { boundBoxes: boundBox1, windowsPosition: windowsPosition1 } = roomInstance1.createBoundBoxes();
@@ -244,16 +251,16 @@ async function init() {
   sceneObjects.push(outside);
 
   // Modelos OBJ
-  // 1. Instancia os carregadores
+  // Instancia os carregadores
   const objLoader = new OBJLoader()
   const textureLoader = new TextureLoader(gl)
   const entityManager = new EntityManager()
   
-  // 2. Carrega o modelo 3D (a lista de pontos) e a imagem (textura)
+  // Carrega o modelo 3D (a lista de pontos) e a imagem (textura)
   const mesaData = await objLoader.load("assets/models/mesa_cabeceira.obj")
   const texturaMadeira = await textureLoader.load("assets/textures/wood_table_diff_4k.jpg")
 
-  // 3. O 'renderer.js' espera a geometria num formato específico (data.position, etc)
+  // O 'renderer.js' espera a geometria num formato específico (data.position, etc)
   const geometriaFormatada = {
     data: {
       position: mesaData.vertices,
@@ -263,10 +270,10 @@ async function init() {
     }
   }
 
-  // 4. Envia os pontos para a memória da Placa de Vídeo (cria os Buffers)
+  // Envia os pontos para a memória da Placa de Vídeo (cria os Buffers)
   const mesaRenderable = createRenderable(gl, geometriaFormatada)
 
-  // 5. Cria o móvel no mundo
+  // Cria o móvel no mundo
   const minhaMesa = new Furniture(
     "mesa-1",
     "Mesa de Cabeceira",
@@ -274,17 +281,21 @@ async function init() {
     mesaRenderable,
     texturaMadeira,
     20.0
-  )
+  );
 
-  // 6. Adiciona ao Gerenciador para a lógica (física, atualizações)
+  // Registra a bounding box dos objetos
+  collisionSystem.addBox([0.0, 0.0, -60.0], [15.0, 20.0, 15.0]);
+
+  // Adiciona ao Gerenciador para a lógica (física, atualizações)
   entityManager.entities.push(minhaMesa);
 
-  // 7. Adiciona a malha 3D da mesa na lista de desenho da Placa de Vídeo
-  sceneObjects.push(minhaMesa.getDrawData())
+  // Adiciona a malha 3D da mesa na lista de desenho da Placa de Vídeo
+  sceneObjects.push(minhaMesa.getDrawData());
 
   requestAnimationFrame(draw);
 }
 
+// Função de gerenciamento do WebGL: configuração, shaders, loop de desenho, etc
 function initGL() {
   const canvas = document.getElementById("glcanvas1");
   gl = Utils.getGL(canvas);
@@ -313,6 +324,7 @@ function initGL() {
   gl.enable(gl.DEPTH_TEST);
 }
 
+// Função de configuração do input do jogador (mouse para olhar, teclado para andar)
 function setupInput() {
   const canvas = gl.canvas;
 
@@ -343,6 +355,7 @@ function setupInput() {
   });
 }
 
+// Função de desenho: limpa a tela, atualiza a posição da câmera, envia os objetos para a Placa de Vídeo, etc
 function draw(time = 0) {
   const deltaTime = (time - lastTime) * 0.001;
   lastTime = time;
