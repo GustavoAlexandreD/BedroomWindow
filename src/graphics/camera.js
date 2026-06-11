@@ -1,9 +1,8 @@
 import { normalize, cross, lookat } from "../utils/math.js";
 
 export function createCamera() {
-  const margin = 5.0;
   return {
-    position: [0, 0, 0], 
+    position: [0, 5, 0], 
     yaw: 0,               
     pitch: 0,             
     speed: 40.0,
@@ -25,7 +24,7 @@ function getRight(camera) {
   );
 }
 
-export function updateCameraMovement(camera, input, deltaTime, collisionSystem) {
+export function updateCameraMovement(camera, input, deltaTime, collisionSystem, windowsPosition) {
   const velocity = camera.speed * deltaTime;
 
   const moveForward = [Math.sin(camera.yaw), 0, -Math.cos(camera.yaw)];
@@ -60,6 +59,36 @@ export function updateCameraMovement(camera, input, deltaTime, collisionSystem) 
       // deslizando-a pela parede (anti-tunneling)
       nextPos = collisionSystem.moveWithCollision(camera.position, nextPos, playerSize);
   }
+
+  let passingWindow = false;
+  if (windowsPosition) {
+    for (const windowPos of windowsPosition) {
+      const [start, end] = windowPos;
+      const minX = Math.min(start[0], end[0]);
+      const maxX = Math.max(start[0], end[0]);
+      const minZ = Math.min(start[2], end[2]);
+      const maxZ = Math.max(start[2], end[2]);
+      const tolerance = 3.0;
+
+      const insideX = nextPos[0] >= minX - tolerance && nextPos[0] <= maxX + tolerance;
+      const insideZ = nextPos[2] >= minZ - tolerance && nextPos[2] <= maxZ + tolerance;
+
+      if (insideX && insideZ) {
+        passingWindow = true;
+        break;
+      }else{
+        passingWindow = false;
+      }
+    }
+  }
+
+  if (passingWindow) {
+    nextPos[1] = 12; // aumenta um pouco para passar pela janela
+  } else {
+    nextPos[1] = 5; // mantém a altura normal
+  }
+
+    // FOV permanece constante; nenhuma interpolação aqui
 
   const margin = 5.0; // margem para evitar que a câmera fique muito próxima da parede
   const startLimit = 60.0 - margin;

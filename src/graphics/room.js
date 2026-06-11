@@ -284,6 +284,7 @@ export class Room{
         const backPosition = this.roomPosition[2] + length/2;
         let windowWidth;
         const boundBoxes = [];
+        const windowsPosition = [];
 
         for(let i=0; i<4; i++){
             if(this.walls[i].type === 0){
@@ -370,6 +371,7 @@ export class Room{
                             boundBoxes.push([[x1-windowWidth/2, this.roomPosition[1], this.roomPosition[2]-60], [windowWidth, 32.0, 5.0]]);
                             if(j+1 > quantity_of_windows) break;
                             x2 = x1 + windowWidth;
+                            windowsPosition.push([[x1, this.roomPosition[1]+windowHeight/2, this.roomPosition[2]-60], [x2, this.roomPosition[1]+windowHeight/2, this.roomPosition[2]-60]]);
                             x = x2;
                         }
                         break;
@@ -382,6 +384,7 @@ export class Room{
                             boundBoxes.push([[x1-windowWidth/2, this.roomPosition[1], this.roomPosition[2]+60], [windowWidth, 32.0, 5.0]]);
                             if(j+1 > quantity_of_windows) break;
                             x2 = x1 + windowWidth;
+                            windowsPosition.push([[x1, this.roomPosition[1]+windowHeight/2, this.roomPosition[2]+60], [x2, this.roomPosition[1]+windowHeight/2, this.roomPosition[2]+60]]);
                             x = x2;
                         }
                         break;
@@ -394,6 +397,7 @@ export class Room{
                             boundBoxes.push([[this.roomPosition[0]+60, this.roomPosition[1], z1-windowWidth/2], [5.0, 32.0, windowWidth]]);
                             if(j+1 > quantity_of_windows) break;
                             z2 = z1 + windowWidth;
+                            windowsPosition.push([[this.roomPosition[0]+60, this.roomPosition[1]+windowHeight/2, z1], [this.roomPosition[0]+60, this.roomPosition[1]+windowHeight/2, z2]]);
                             z = z2;
                         }
                         break;
@@ -406,12 +410,13 @@ export class Room{
                             boundBoxes.push([[this.roomPosition[0]-60, this.roomPosition[1], z1-windowWidth/2], [5.0, 32.0, windowWidth]]);
                             if(j+1 > quantity_of_windows) break;
                             z2 = z1 + windowWidth;
+                            windowsPosition.push([[this.roomPosition[0]-60, this.roomPosition[1]+windowHeight/2, z1], [this.roomPosition[0]-60, this.roomPosition[1]+windowHeight/2, z2]]);
                             z = z2;
                         }
                         break;
                 }
             }
         }
-        return boundBoxes;
+        return { boundBoxes, windowsPosition };
     }
 }
