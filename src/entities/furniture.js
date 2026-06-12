@@ -1,11 +1,15 @@
 import { Entity } from "./entity.js"
 
 export class Furniture extends Entity {
-    constructor(id, name, position, renderableData, texture, scale = 1.0) {
+    constructor(id, name, position, renderableData, texture, scale = 1.0, boxSize = [10.0, 10.0, 10.0]) {
         super({ id, name, position })
-        this.renderable = renderableData
-        this.renderable.texture = texture
-        this.renderable.transform = {
+        
+        // Dados compartilhados da GPU (Buffers, Indices, etc)
+        this.meshData = renderableData; 
+        this.texture = texture;
+        
+        // Dados individuais DESTA mesa específica
+        this.transform = {
             x: position[0],
             y: position[1],
             z: position[2],
@@ -13,15 +17,18 @@ export class Furniture extends Entity {
             ry: 0,
             rz: 0,
             scale: scale
-        }
+        };
+        this.boxSize = boxSize; 
     }
 
-    update(dt) {
-
-    }
+    update(dt) {}
 
     getDrawData() {
-        return this.renderable
+        // Na hora de desenhar, nós juntamos a malha da GPU com a posição deste objeto específico!
+        return {
+            ...this.meshData, // Puxa os buffers (buffer, normalBuffer, indexBuffer...)
+            texture: this.texture,
+            transform: this.transform
+        };
     }
 }
-

@@ -10,11 +10,13 @@ import { createRenderable } from "./graphics/renderer.js";
 import { Furniture } from "./entities/furniture.js"
 import { EntityManager } from "./game/entity-manager.js";
 import { CollisionSystem } from "./game/collision.js"
+import { EntityFactory } from "./entities/entityFactory.js";
 
 //Variáveis globais
 let gl, prog, lightProg;
 let sceneObjects = [];
 let collisionSystem;
+let entityManager;
 
 // Câmera
 let camera;
@@ -31,12 +33,8 @@ const input = {
 
 // Luz dinâmica do jogador (Lampião)
 const dynamicLightColor = [1.0, 0.42, 0.1]; // Ajuste aqui para mudar a cor da luz
-const InitialplayerLightRadius = 90.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
+const InitialplayerLightRadius = 500.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
 let playerLightRadius; // Variável que será animada ao longo do tempo
-
-//Modelos e texturas
-const models = ["assets/models/lua.obj", "assets/models/cama.obj", "assets/models/mesa_cabeceira.obj", "assets/models/relogio_parede.obj", "assets/models/blob_sorrateiro.obj", "assets/models/glob_rastejante.obj", "assets/models/grub_batedor.obj", "assets/fake_gato.obj"];
-const texSrc = ["assets/textures/wood_table_disp_4k.png", "assets/textures/grama.jpg"];
 
 // Função de inicialização (Carrega texturas, modelos, configura a cena, etc)
 async function init() {
@@ -47,11 +45,6 @@ async function init() {
   // Configura o input do jogador (mouse e teclado)
   setupInput();
 
-  // Carrega as texturas necessárias para a cena
-  const loadedImages = await Promise.all(
-    texSrc.map(url => Utils.loadImage(url))
-  );
-
   const roomImg = await Utils.loadImage("assets/textures/dark-grunge-texture.jpg");
   const outsideImg = await Utils.loadImage("assets/textures/grama.jpg");
 
@@ -61,8 +54,9 @@ async function init() {
   // Configura a cena (Câmera, objetos, colisões, etc)
   camera = createCamera();
 
-  // Inicia o sistema de colisão
+  // Inicia os sistemas principais
   collisionSystem = new CollisionSystem();
+  entityManager = new EntityManager();
 
   // Quartos (Desenho por código + caixas de colisão)
   const roomInstance1 = new Room([0,0,0], [0,0], [0,0], [0,0], [2,2]);
@@ -251,46 +245,15 @@ async function init() {
   sceneObjects.push(outside);
 
   // Modelos OBJ
-  // Instancia os carregadores
-  const objLoader = new OBJLoader()
-  const textureLoader = new TextureLoader(gl)
-  const entityManager = new EntityManager()
-  
-  // Carrega o modelo 3D (a lista de pontos) e a imagem (textura)
-  const mesaData = await objLoader.load("assets/models/mesa_cabeceira.obj")
-  const texturaMadeira = await textureLoader.load("assets/textures/wood_table_diff_4k.jpg")
+  // 1. Instancia a fábrica
+  const factory = new EntityFactory(gl, entityManager, sceneObjects, collisionSystem);
 
-  // O 'renderer.js' espera a geometria num formato específico (data.position, etc)
-  const geometriaFormatada = {
-    data: {
-      position: mesaData.vertices,
-      normal: mesaData.normals,
-      texcoord: mesaData.uvs,
-      indices: mesaData.indices
-    }
-  }
+  // 2. Pré-carrega TODOS os objetos antes do jogo começar 
+  await factory.preloadAll();
 
-  // Envia os pontos para a memória da Placa de Vídeo (cria os Buffers)
-  const mesaRenderable = createRenderable(gl, geometriaFormatada)
-
-  // Cria o móvel no mundo
-  const minhaMesa = new Furniture(
-    "mesa-1",
-    "Mesa de Cabeceira",
-    [0.0, -0.5, -2.7],
-    mesaRenderable,
-    texturaMadeira,
-    20.0
-  );
-
-  // Registra a bounding box dos objetos
-  collisionSystem.addBox([0.0, 0.0, -60.0], [15.0, 20.0, 15.0]);
-
-  // Adiciona ao Gerenciador para a lógica (física, atualizações)
-  entityManager.entities.push(minhaMesa);
-
-  // Adiciona a malha 3D da mesa na lista de desenho da Placa de Vídeo
-  sceneObjects.push(minhaMesa.getDrawData());
+  // 3. Spawna os objetos pelo mapa de forma instantânea (porque já estão no cache)
+  await factory.createFurniture("mesa_cabeceira", [10.0, -10.0, -50.0]);
+  await factory.createFurniture("gato", [10.0, 0.0, -50.0]);
 
   requestAnimationFrame(draw);
 }
@@ -371,6 +334,7 @@ function draw(time = 0) {
   playerLightRadius = playerLightRadius - (playerLightRadius/8) * Math.sin(time * 0.001); // Anima o raio da luz do jogador para um efeito pulsante
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  entityManager.update(deltaTime);
   updateCameraMovement(camera, input, deltaTime, collisionSystem, windowsPosition);
 
   const aspect = gl.canvas.width / gl.canvas.height;
@@ -486,7 +450,11 @@ function draw(time = 0) {
       obj.transform.z
     );
 
-    const model = Math3D.multiply(Math3D.multiply(matR, matS), matT);
+    // Primeiro junta a Rotação com a Escala
+    const matRS = Math3D.multiply(matR, matS);
+
+    // Depois junta a Translação com o resultado anterior (Ordem T * R * S)
+    const model = Math3D.multiply(matT, matRS);
 
     gl.uniformMatrix4fv(
       gl.getUniformLocation(program, "transf"),
