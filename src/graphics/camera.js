@@ -114,16 +114,16 @@ export function updateCameraLook(camera, dx, dy) {
   camera.pitch = Math.max(-limit, Math.min(limit, camera.pitch));
 }
 
-export function getViewMatrix(camera) {
+export function getViewMatrix(camera, eyePosition = camera.position) {
   const forward = getForward(camera);
   const target = [
-    camera.position[0] + forward[0],
-    camera.position[1] + forward[1],
-    camera.position[2] + forward[2]
+    eyePosition[0] + forward[0],
+    eyePosition[1] + forward[1],
+    eyePosition[2] + forward[2]
   ];
 
   return lookat(
-    camera.position,
+    eyePosition,
     target,
     [0, 1, 0]
   );

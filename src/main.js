@@ -24,6 +24,7 @@ let camera;
 let lastTime = 0;
 let windowsPosition = [];
 let audioManager = null;
+const FIXED_CAMERA_HEIGHT = 5.0;
 
 // Input
 const input = {
@@ -405,7 +406,12 @@ function draw(time = 0) {
 
   const aspect = gl.canvas.width / gl.canvas.height;
   const projection = Math3D.createPerspective(60, aspect, 0.5, 2000);
-  const view = getViewMatrix(camera);
+  const view = getViewMatrix(camera, [0, FIXED_CAMERA_HEIGHT, 0]);
+  const worldTransform = Math3D.translationMatrix(
+    -camera.position[0],
+    FIXED_CAMERA_HEIGHT - camera.position[1],
+    -camera.position[2]
+  );
 
   sceneObjects.forEach((obj, index) => {
     const program = obj.isLightSource ? lightProg : prog;
@@ -440,14 +446,16 @@ function draw(time = 0) {
     if (!obj.isLightSource) {
       gl.uniform3f(
         gl.getUniformLocation(program, "u_lightPosStatic"),
-        20, 50, 40
+        20 - camera.position[0],
+        50 + FIXED_CAMERA_HEIGHT - camera.position[1],
+        40 - camera.position[2]
       );
-      // Use a posição do jogador/câmera como fonte de luz dinâmica
+      // Use a posição da câmera fixa como fonte de luz dinâmica
       gl.uniform3f(
         gl.getUniformLocation(program, "u_lightPosDynamic"),
-        camera.position[0],
-        camera.position[1],
-        camera.position[2]
+        0.0,
+        FIXED_CAMERA_HEIGHT,
+        0.0
       );
       // Envia o raio da luz do jogador
       gl.uniform1f(
@@ -462,9 +470,9 @@ function draw(time = 0) {
       );
       gl.uniform3f(
         gl.getUniformLocation(program, "u_viewPosition"),
-        camera.position[0],
-        camera.position[1],
-        camera.position[2]
+        0.0,
+        FIXED_CAMERA_HEIGHT,
+        0.0
       );
     }
 
@@ -521,11 +529,12 @@ function draw(time = 0) {
 
     // Depois junta a Translação com o resultado anterior (Ordem T * R * S)
     const model = Math3D.multiply(matT, matRS);
+    const worldModel = Math3D.multiply(worldTransform, model);
 
     gl.uniformMatrix4fv(
       gl.getUniformLocation(program, "transf"),
       false,
-      model
+      worldModel
     );
 
       // Se tiver o buffer de índices (É um móvel ou monstro .obj)
