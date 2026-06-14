@@ -47,6 +47,13 @@ export class EntityFactory {
                 flipY: false,
                 scale: 30.0,
                 boxSize: [15.0, 20.0, 15.0]
+            },
+            "quadro": {
+                name:"Quadro",
+                objPath: "assets/models/fancy_picture_frame_01_1k.obj",
+                color: [1.0, 0.0, 0.0, 1.0],
+                scale: 10.0,
+                boxSize: [10.0, 10.0, 10.0]
             }
             // Adicione os monstros aqui seguindo o mesmo padrão
         };
@@ -62,9 +69,12 @@ export class EntityFactory {
         const loaderLocal = new OBJLoader();
         const rawData = await loaderLocal.load(bp.objPath);
         
-        const texture = await this.textureLoader.load(bp.texPath, { 
-            flipY: bp.flipY !== undefined ? bp.flipY : true 
-        });
+        let texture = null;
+        if (bp.texPath) {
+            texture = await this.textureLoader.load(bp.texPath, { 
+                flipY: bp.flipY !== undefined ? bp.flipY : true 
+            });
+        }
         
         const geom = {
             data: {
@@ -112,7 +122,15 @@ export class EntityFactory {
         }
 
         this.entityManager.entities.push(entity);
-        this.sceneObjects.push(entity.getDrawData());
+        // Pega nos dados visuais da entidade
+        const drawData = entity.getDrawData();
+        
+        // Se o blueprint tiver uma cor sólida, injetamos a cor nos dados de desenho!
+        if (bp.color) {
+            drawData.color = bp.color;
+        }
+
+        this.sceneObjects.push(drawData);
         
         if (this.collisionSystem && entity.boxSize) {
             this.collisionSystem.addBox(entity.position, entity.boxSize);

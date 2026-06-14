@@ -270,6 +270,8 @@ async function init() {
   gato.transform.ry = 180;
   const relogio = await factory.createFurniture("relogio", [roomInstance15.roomPosition[0]-20.0, roomInstance15.roomPosition[1]+0.0, roomInstance15.roomPosition[2]+52.0]);
   relogio.transform.ry = 180;
+  const quadro = await factory.createFurniture("quadro", [roomInstance15.roomPosition[0]+10.0, roomInstance15.roomPosition[1]+5.0, roomInstance15.roomPosition[2]+59.0]);
+  quadro.transform.ry = 180;
 
   requestAnimationFrame(draw);
 }
