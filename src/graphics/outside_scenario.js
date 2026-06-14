@@ -6,7 +6,7 @@ export function createOutsideScenario(gl) {
     const normals = [];
     const texcoords = [];
 
-    const length = 500; 
+    const length = 700; 
     const width = 500;
 
     // Chao externo (Redor da casa)

@@ -144,22 +144,35 @@ export class AudioManager {
     // =========================
     // MONSTRO (toca evento que desativa os outros sons enquanto durar)
     // =========================
-    playMonsterNow() {
+    playMonsterNow({ volume = 1.0, onEnded } = {}) {
         const list = [this._resolveName('som-monstro'), this._resolveName('som2-monstro')];
         const key = list[this.monsterIndex % list.length];
         this.monsterIndex++;
 
         const buffer = this.buffers[key];
-        if (!buffer) return;
+        if (!buffer) return 0;
         // toca o grunhido do monstro sem silenciar outros canais
         const src = this.context.createBufferSource();
         src.buffer = buffer;
-        src.connect(this.monsterGain);
+
+        const gainNode = this.context.createGain();
+        gainNode.gain.value = volume;
+
+        src.connect(gainNode);
+        gainNode.connect(this.monsterGain);
         src.start(0);
 
         src.onended = () => {
-            try { src.disconnect(); } catch (e) {}
+            try {
+                src.disconnect();
+                gainNode.disconnect();
+            } catch (e) {}
+            if (typeof onEnded === 'function') {
+                onEnded();
+            }
         };
+
+        return buffer.duration;
     }
 
     startMonsterEvents(intervalMs = 45000) {

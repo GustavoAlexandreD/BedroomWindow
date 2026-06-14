@@ -35,7 +35,7 @@ const input = {
 
 // Luz dinâmica do jogador (Lampião)
 const dynamicLightColor = [1.0, 0.42, 0.1]; // Ajuste aqui para mudar a cor da luz
-const InitialplayerLightRadius = 200.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
+const InitialplayerLightRadius = 60.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
 let playerLightRadius; // Variável que será animada ao longo do tempo
 
 // Função de inicialização (Carrega texturas, modelos, configura a cena, etc)
@@ -301,7 +301,7 @@ function initGL() {
   lightProg = Utils.createProgram(gl, vShader, lfShader);
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  gl.clearColor(0.0, 0.0, 0.025, 1.0);
   gl.enable(gl.DEPTH_TEST);
 }
 
@@ -322,10 +322,10 @@ function setupInput() {
   });
 
   window.addEventListener("keydown", e => {
-    if (e.key === "w") input.forward = true;
-    if (e.key === "s") input.backward = true;
-    if (e.key === "a") input.left = true;
-    if (e.key === "d") input.right = true;
+    if (e.key === "w" || e.key === "ArrowUp") input.forward = true;
+    if (e.key === "s" || e.key === "ArrowDown") input.backward = true;
+    if (e.key === "a" || e.key === "ArrowLeft") input.left = true;
+    if (e.key === "d" || e.key === "ArrowRight") input.right = true;
 
     if (e.key.toLowerCase() === "f") {
         const gato = entityManager.entities.find(ent => ent.name === "Gato low poly" || ent.id.includes("gato"));
@@ -336,10 +336,10 @@ function setupInput() {
   });
 
   window.addEventListener("keyup", e => {
-    if (e.key === "w") input.forward = false;
-    if (e.key === "s") input.backward = false;
-    if (e.key === "a") input.left = false;
-    if (e.key === "d") input.right = false;
+    if (e.key === "w" || e.key === "ArrowUp") input.forward = false;
+    if (e.key === "s" || e.key === "ArrowDown") input.backward = false;
+    if (e.key === "a" || e.key === "ArrowLeft") input.left = false;
+    if (e.key === "d" || e.key === "ArrowRight") input.right = false;
   });
 }
 
@@ -349,13 +349,34 @@ function draw(time = 0) {
   lastTime = time;
   
   // Lógica da tua luz e Game Over
-  playerLightRadius = InitialplayerLightRadius - (time * 0.002);
+  playerLightRadius = InitialplayerLightRadius - (time * 0.0003);
   if (camera.position[0] >= -290 && camera.position[0] <= -195 && camera.position[2] >= -430 && camera.position[2] <= -425) {
     window.location.href = "win.html";
     return;
   }
+  console.log("Raio de luz: ", playerLightRadius);
   if (playerLightRadius <= 40.0) {
-    window.location.href = "gameOver.html";
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    if (audioManager) {
+      let gameOverTriggered = false;
+      const gotoGameOver = () => {
+        if (gameOverTriggered) return;
+        gameOverTriggered = true;
+        window.location.href = "gameOver.html";
+      };
+
+      const duration = audioManager.playMonsterNow({
+        volume: 1.2,
+        onEnded: gotoGameOver
+      });
+
+      const fallbackDelay = Math.max(duration * 1000 + 800, 1200);
+      setTimeout(gotoGameOver, fallbackDelay);
+    } else {
+      window.location.href = "gameOver.html";
+    }
     return;
   }
   playerLightRadius = playerLightRadius - (playerLightRadius/8) * Math.sin(time * 0.001); 
