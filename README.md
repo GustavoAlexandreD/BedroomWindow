@@ -320,26 +320,9 @@ http-server
 - Eventos: API nativa do navegador
 - Nenhuma biblioteca gráfica de alto nível
 
-### Performance
-- Renderização a 60 FPS (quando suportado pelo navegador)
-- Culling de objetos fora da view
-- Otimização de VAO/VBO
-
 ---
 
 ## 📋 Licença
 
 Este projeto foi desenvolvido como atividade acadêmica para a disciplina de Computação Gráfica.
 
----
-
-## 🐛 Troubleshooting
-
-**Problema:** "CORS error ao carregar texturas"
-- **Solução:** Use um servidor local (Live Server, http-server, etc.)
-
-**Problema:** "WebGL context não inicializa"
-- **Solução:** Verifique se seu navegador suporta WebGL 2.0
-
-**Problema:** "Modelos OBJ não carregam"
-- **Solução:** Verifique os caminhos em `assets/models/` e console do navegador
