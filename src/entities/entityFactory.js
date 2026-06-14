@@ -2,11 +2,13 @@ import { Furniture } from "./furniture.js";
 import { OBJLoader } from "../models/obj-loader.js";
 import { TextureLoader } from "../graphics/texture-loader.js";
 import { createRenderable } from "../graphics/renderer.js";
+import { Cat } from "./cat.js";
 
 export class EntityFactory {
-    constructor(gl, entityManager, sceneObjects, collisionSystem) {
+    constructor(gl, entityManager, audioManager, sceneObjects, collisionSystem) {
         this.gl = gl;
         this.entityManager = entityManager;
+        this.audioManager = audioManager;
         this.sceneObjects = sceneObjects;
         this.collisionSystem = collisionSystem;
 
@@ -24,17 +26,27 @@ export class EntityFactory {
             },
             "cama": {
                 name: "Cama",
-                objPath: "assets/models/cama.obj",
-                texPath: "assets/textures/wood_table_diff_4k.jpg", 
+                objPath: "assets/models/GothicBed_01_1k.obj",
+                texPath: "assets/textures/gothic_bed_ready.jpg",
+                flipY: false,
                 scale: 30.0,
-                boxSize: [40.0, 15.0, 80.0]
+                boxSize: [20.0, 15.0, 40.0]
             },
             "gato": {
-                name: "Gato",
-                objPath: "assets/models/fake_gato.obj",
-                texPath: "assets/textures/wood_table_disp_4k.png",
+                name: "Gato low poly",
+                objPath: "assets/models/cat.obj",
+                texPath: "assets/textures/cat_free.png",
+                flipY: false,
                 scale: 5.0,
                 boxSize: [5.0, 5.0, 5.0]
+            },
+            "relogio": {
+                name:"Relogio",
+                objPath: "assets/models/vintage_grandfather_clock_01_1k.obj",
+                texPath: "assets/textures/vintage_grandfather_clock_01_diff_1k.jpg",
+                flipY: false,
+                scale: 30.0,
+                boxSize: [15.0, 20.0, 15.0]
             }
             // Adicione os monstros aqui seguindo o mesmo padrão
         };
@@ -50,7 +62,9 @@ export class EntityFactory {
         const loaderLocal = new OBJLoader();
         const rawData = await loaderLocal.load(bp.objPath);
         
-        const texture = await this.textureLoader.load(bp.texPath);
+        const texture = await this.textureLoader.load(bp.texPath, { 
+            flipY: bp.flipY !== undefined ? bp.flipY : true 
+        });
         
         const geom = {
             data: {
@@ -82,20 +96,28 @@ export class EntityFactory {
         const assets = await this.loadBlueprint(type); 
         const bp = this.blueprints[type];
         const id = `${type}-${Date.now()}`;
-        
-        const furniture = new Furniture(
-            id, bp.name, position, 
-            assets.renderable, assets.texture, 
-            bp.scale, bp.boxSize
-        );
-
-        this.entityManager.entities.push(furniture);
-        this.sceneObjects.push(furniture.getDrawData());
-        
-        if (this.collisionSystem && furniture.boxSize) {
-            this.collisionSystem.addBox(furniture.position, furniture.boxSize);
+        let entity = null;
+        if (type == "gato") {
+            entity = new Cat (
+                id, bp.name, position, 
+                assets.renderable, assets.texture, this.audioManager,
+                bp.scale, bp.boxSize
+            )
+        } else {
+            entity = new Furniture(
+                id, bp.name, position, 
+                assets.renderable, assets.texture, 
+                bp.scale, bp.boxSize
+            );
         }
 
-        return furniture;
+        this.entityManager.entities.push(entity);
+        this.sceneObjects.push(entity.getDrawData());
+        
+        if (this.collisionSystem && entity.boxSize) {
+            this.collisionSystem.addBox(entity.position, entity.boxSize);
+        }
+
+        return entity;
     }
 }

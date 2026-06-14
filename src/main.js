@@ -35,7 +35,7 @@ const input = {
 
 // Luz dinâmica do jogador (Lampião)
 const dynamicLightColor = [1.0, 0.42, 0.1]; // Ajuste aqui para mudar a cor da luz
-const InitialplayerLightRadius = 500.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
+const InitialplayerLightRadius = 200.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
 let playerLightRadius; // Variável que será animada ao longo do tempo
 
 // Função de inicialização (Carrega texturas, modelos, configura a cena, etc)
@@ -256,14 +256,20 @@ async function init() {
 
   // Modelos OBJ
   // 1. Instancia a fábrica
-  const factory = new EntityFactory(gl, entityManager, sceneObjects, collisionSystem);
+  const factory = new EntityFactory(gl, entityManager, audioManager, sceneObjects, collisionSystem);
 
   // 2. Pré-carrega TODOS os objetos antes do jogo começar 
   await factory.preloadAll();
 
   // 3. Spawna os objetos pelo mapa de forma instantânea (porque já estão no cache)
-  await factory.createFurniture("mesa_cabeceira", [10.0, -10.0, -50.0]);
-  await factory.createFurniture("gato", [10.0, 0.0, -50.0]);
+  const mesa = await factory.createFurniture("mesa_cabeceira", [roomInstance15.roomPosition[0]+10.0, roomInstance15.roomPosition[1]-10.0, roomInstance15.roomPosition[2]+52.0]);
+  mesa.transform.ry = 180;
+  const camaGotica = await factory.createFurniture("cama", [roomInstance15.roomPosition[0]+50.0, roomInstance15.roomPosition[1]-5.0, roomInstance15.roomPosition[2]+42.0]);
+  camaGotica.transform.ry = 180;
+  const gato = await factory.createFurniture("gato", [roomInstance15.roomPosition[0]+50.0, roomInstance15.roomPosition[1]-13.0, roomInstance15.roomPosition[2]+42.0]);
+  gato.transform.ry = 180;
+  const relogio = await factory.createFurniture("relogio", [roomInstance15.roomPosition[0]-20.0, roomInstance15.roomPosition[1]+0.0, roomInstance15.roomPosition[2]+52.0]);
+  relogio.transform.ry = 180;
 
   requestAnimationFrame(draw);
 }
@@ -318,6 +324,13 @@ function setupInput() {
     if (e.key === "s") input.backward = true;
     if (e.key === "a") input.left = true;
     if (e.key === "d") input.right = true;
+
+    if (e.key.toLowerCase() === "f") {
+        const gato = entityManager.entities.find(ent => ent.name === "Gato low poly" || ent.id.includes("gato"));
+        if (gato && gato.interact) {
+            gato.interact();
+        }
+    }
   });
 
   window.addEventListener("keyup", e => {
@@ -328,11 +341,13 @@ function setupInput() {
   });
 }
 
-// Função de desenho: limpa a tela, atualiza a posição da câmera, envia os objetos para a Placa de Vídeo, etc
+// Função de desenho
 function draw(time = 0) {
   const deltaTime = (time - lastTime) * 0.001;
   lastTime = time;
-  playerLightRadius = InitialplayerLightRadius - (time * 0.0003);
+  
+  // Lógica da tua luz e Game Over
+  playerLightRadius = InitialplayerLightRadius - (time * 0.002);
   if (camera.position[0] >= -290 && camera.position[0] <= -195 && camera.position[2] >= -430 && camera.position[2] <= -425) {
     window.location.href = "win.html";
     return;
@@ -341,10 +356,15 @@ function draw(time = 0) {
     window.location.href = "gameOver.html";
     return;
   }
-  playerLightRadius = playerLightRadius - (playerLightRadius/8) * Math.sin(time * 0.001); // Anima o raio da luz do jogador para um efeito pulsante
+  playerLightRadius = playerLightRadius - (playerLightRadius/8) * Math.sin(time * 0.001); 
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  entityManager.update(deltaTime);
+
+  if (typeof entityManager !== 'undefined') {
+      entityManager.update(deltaTime);
+  }
+
+  // A movimentação da câmara original volta a funcionar corretamente
   updateCameraMovement(camera, input, deltaTime, collisionSystem, windowsPosition);
 
   // atualiza listener 3D para o áudio (posição e direção do jogador)

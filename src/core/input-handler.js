@@ -31,6 +31,10 @@ export class InputHandler {
             if (e.key === "Escape") {
                 this.togglePause();
             }
+
+            if (e.key === "f") {
+                window.dispatchEvent(new CustomEvent("playerInteract"));
+            }
         });
 
         window.addEventListener("keyup", (e) => {

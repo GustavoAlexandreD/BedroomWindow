@@ -256,7 +256,16 @@ export class AudioManager {
         panner.positionY.setValueAtTime(position[1], this.context.currentTime);
         panner.positionZ.setValueAtTime(position[2], this.context.currentTime);
 
-        source.connect(panner).connect(this.sfxGain);
+        // Cria um controlador de volume específico para este som
+        const localGain = this.context.createGain();
+
+        // Lê o volume das opções. Se não enviares nenhum, o padrão mantém-se em 1.0
+        localGain.gain.value = options.volume !== undefined ? options.volume : 1.0;
+
+        // Liga as peças: Som -> Volume Individual -> Panner 3D -> Volume Geral de SFX
+        source.connect(localGain);
+        localGain.connect(panner);
+        panner.connect(this.sfxGain);
 
         return { source, panner };
     }

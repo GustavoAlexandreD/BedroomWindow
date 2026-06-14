@@ -1,45 +1,67 @@
-import { Entity } from "./entity.js";
+import { Entity } from "./entity.js"
 
 export class Cat extends Entity {
-    constructor(deps = {}) {
-        super({ name: "cat", ...deps });
-        this.noiseIntervalMs = 1700;
-        this.breakAfterMs = 14000;
+    constructor(id, name, position, renderableData, texture, audioManager, scale = 1.0, boxSize = [10.0, 10.0, 10.0]) {
+        super({ id, name, position, audioManager });
+        
+        this.meshData = renderableData; 
+        this.texture = texture;
+        
+        this.transform = {
+            x: position[0],
+            y: position[1],
+            z: position[2],
+            rx: 0, ry: 0, rz: 0,
+            scale: scale
+        };
+        this.boxSize = boxSize; 
+
+        // Controle da Animação
+        this.startY = position[1];             // Onde ele começa (escondido)
+        this.targetY = position[1] + 6.0;     // Altura do topo da cama
+        this.animState = "IDLE";               // Começa dormindo
+        this.speed = 10.0;                     // Velocidade da subida
+        this.waitTimer = 0;                    
     }
 
-    spawn() {
-        this.isActive = true;
-        this._fazerBarulhoNaJanelaExistente();
-        if (this.audioManager?.playEntitySpawn) {
-            this.audioManager.playEntitySpawn("cat", this.position, { refDistance: 1.5, maxDistance: 25 });
-            this.audioManager.startEntityCharacteristicLoop(
-                this.id,
-                "cat",
-                () => this.position,
-                6000,
-                12000
-            );
-        } else {
-            this._tocarSom3D("batida-janela", { refDistance: 1.5, maxDistance: 25 });
+    interact() {
+        if (this.animState === "IDLE") {
+            this.animState = "EMERGING"; // Acorda o gato!
         }
-        this.iniciarBarulhoTemporizado();
-        this.iniciarQuebraJanelaTemporizada();
     }
 
-    iniciarBarulhoTemporizado() {
-        if (this._noiseIntervalId) clearInterval(this._noiseIntervalId);
-        this._noiseIntervalId = setInterval(() => {
-            if (!this.isActive || this.isBroken) return;
-            this._fazerBarulhoNaJanelaExistente();
-            this._tocarSom3D("batida-janela", { refDistance: 1.5, maxDistance: 25 });
-        }, this.noiseIntervalMs);
+    update(dt) {
+        if (!dt) return; 
+
+        if (this.animState === "EMERGING") {
+            this.transform.y += this.speed * dt;
+            if (this.transform.y >= this.targetY) {
+                this.transform.y = this.targetY; 
+                this.animState = "MEOWING";
+                this.waitTimer = 2.0; // Fica 2 segundos miando
+                this._tocarSom3D("som-gato", { volume: 50.0 }); // Toca o som!
+            }
+        } 
+        else if (this.animState === "MEOWING") {
+            this.waitTimer -= dt;
+            if (this.waitTimer <= 0) {
+                this.animState = "HIDING";
+            }
+        } 
+        else if (this.animState === "HIDING") {
+            this.transform.y -= this.speed * dt;
+            if (this.transform.y <= this.startY) {
+                this.transform.y = this.startY; 
+                this.animState = "IDLE"; 
+            }
+        }
     }
 
-    iniciarQuebraJanelaTemporizada() {
-        if (this._breakTimeoutId) clearTimeout(this._breakTimeoutId);
-        this._breakTimeoutId = setTimeout(() => {
-            if (!this.isActive || this.isBroken) return;
-            this._quebrarJanelaEFimDeJogo();
-        }, this.breakAfterMs);
+    getDrawData() {
+        return {
+            ...this.meshData,
+            texture: this.texture,
+            transform: this.transform
+        };
     }
 }
