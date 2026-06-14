@@ -35,7 +35,7 @@ const input = {
 
 // Luz dinâmica do jogador (Lampião)
 const dynamicLightColor = [1.0, 0.42, 0.1]; // Ajuste aqui para mudar a cor da luz
-const InitialplayerLightRadius = 60.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
+const InitialplayerLightRadius = 90.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
 let playerLightRadius; // Variável que será animada ao longo do tempo
 
 // Função de inicialização (Carrega texturas, modelos, configura a cena, etc)
@@ -348,13 +348,16 @@ function draw(time = 0) {
   const deltaTime = (time - lastTime) * 0.001;
   lastTime = time;
   
-  // Lógica da tua luz e Game Over
+  // Lógica para a diminuição do raio de luz do jogador
   playerLightRadius = InitialplayerLightRadius - (time * 0.0003);
+
+  //Verificação se o jogador está na janela de saída
   if (camera.position[0] >= -290 && camera.position[0] <= -195 && camera.position[2] >= -430 && camera.position[2] <= -425) {
     window.location.href = "win.html";
     return;
   }
-  console.log("Raio de luz: ", playerLightRadius);
+
+  //Verificação se o fogo está fraco, se sim, o jogador é capturado pelo monstro
   if (playerLightRadius <= 40.0) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -379,7 +382,7 @@ function draw(time = 0) {
     }
     return;
   }
-  playerLightRadius = playerLightRadius - (playerLightRadius/8) * Math.sin(time * 0.001); 
+  playerLightRadius = playerLightRadius - (playerLightRadius/8) * Math.sin(time * 0.001); //Animação da luz para simular a oscilação do fogo
 
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
