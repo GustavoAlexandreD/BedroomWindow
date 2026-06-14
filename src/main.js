@@ -11,6 +11,7 @@ import { Furniture } from "./entities/furniture.js"
 import { EntityManager } from "./game/entity-manager.js";
 import { CollisionSystem } from "./game/collision.js"
 import { EntityFactory } from "./entities/entityFactory.js";
+import { AudioManager } from "./audio/audio-manager.js";
 
 //Variáveis globais
 let gl, prog, lightProg;
@@ -22,6 +23,7 @@ let entityManager;
 let camera;
 let lastTime = 0;
 let windowsPosition = [];
+let audioManager = null;
 
 // Input
 const input = {
@@ -57,6 +59,14 @@ async function init() {
   // Inicia os sistemas principais
   collisionSystem = new CollisionSystem();
   entityManager = new EntityManager();
+
+  // Inicia o gerenciador de áudio (carrega assets definidos em src/audio/audio-manager.js)
+  audioManager = new AudioManager();
+  await audioManager.ready;
+  // inicia os loops de ambiência (não inicia BGM—música principal é gerenciada pelas telas/menu)
+  audioManager.startAmbience();
+  // inicia eventos do monstro a cada 45s (alternando os dois sons)
+  audioManager.startMonsterEvents(45000);
 
   // Quartos (Desenho por código + caixas de colisão)
   const roomInstance1 = new Room([0,0,0], [0,0], [0,0], [0,0], [2,2]);
@@ -336,6 +346,16 @@ function draw(time = 0) {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   entityManager.update(deltaTime);
   updateCameraMovement(camera, input, deltaTime, collisionSystem, windowsPosition);
+
+  // atualiza listener 3D para o áudio (posição e direção do jogador)
+  if (audioManager) {
+    const forward = [
+      Math.sin(camera.yaw) * Math.cos(camera.pitch),
+      Math.sin(camera.pitch),
+      -Math.cos(camera.yaw) * Math.cos(camera.pitch)
+    ];
+    audioManager.updateListener(camera.position, forward);
+  }
 
   const aspect = gl.canvas.width / gl.canvas.height;
   const projection = Math3D.createPerspective(60, aspect, 0.5, 2000);

@@ -12,12 +12,15 @@ export class AudioManager {
         // =========================
         this.paths = {
             "musica-principal": "assets/audio/musica-principal.mp3",
+            "som-silencio": "assets/audio/som-silencio.mp3",
+            "fogo-tocha": "assets/audio/fogo-tocha.mp3",
             "batida-janela": "assets/audio/batida-janela.mp3",
             "som-chuva-janela": "assets/audio/som-chuva-janela.mp3",
             "som-gato": "assets/audio/som-gato.mp3",
             "som-coruja": "assets/audio/som-coruja.mp3",
             "vidro-quebrando": "assets/audio/vidro-quebrando.mp3",
-            "som-monstro": "assets/audio/som-monstro.mp3"
+            "som-monstro": "assets/audio/som-monstro.mp3",
+            "som2-monstro": "assets/audio/som2-monstro.mp3"
         };
 
         // Compatibilidade com nomes antigos usados em outras partes do projeto.
@@ -47,6 +50,10 @@ export class AudioManager {
 
         this.bgmGain.connect(this.masterGain);
         this.sfxGain.connect(this.masterGain);
+        // Ganho específico para sons de monstro (para poder tocar mesmo quando SFX/BGM forem silenciados)
+        this.monsterGain = this.context.createGain();
+        this.monsterGain.gain.value = 1;
+        this.monsterGain.connect(this.masterGain);
         this.masterGain.connect(this.context.destination);
 
         // =========================
@@ -60,12 +67,17 @@ export class AudioManager {
         // =========================
         this.activeSources = new Set();
         this.entityCharacteristicTimers = new Map();
+        this.ambientSources = [];
+        this.monsterIndex = 0;
+        this.monsterIntervalId = null;
+        this._savedGains = null;
 
         // =========================
         // 🔄 INIT
         // =========================
         this._initUnlock();
-        this._loadAll();
+        // expõe uma Promise ready para que o jogo espere os áudios carregarem
+        this.ready = this._loadAll();
     }
 
     // =========================
@@ -96,6 +108,69 @@ export class AudioManager {
         }
 
         console.log("✅ Áudios carregados");
+    }
+
+    // =========================
+    // AMBIÊNCIA (dois loops que devem tocar juntos)
+    // =========================
+    startAmbience() {
+        // Se já estiver tocando, ignora
+        if (this.ambientSources.length > 0) return;
+
+        const keys = [this._resolveName('som-silencio'), this._resolveName('fogo-tocha')];
+
+        for (const key of keys) {
+            const buffer = this.buffers[key];
+            if (!buffer) continue;
+            const src = this.context.createBufferSource();
+            src.buffer = buffer;
+            src.loop = true;
+            src.connect(this.sfxGain);
+            src.start(0);
+            this.ambientSources.push(src);
+        }
+    }
+
+    stopAmbience() {
+        for (const src of this.ambientSources) {
+            try {
+                src.stop();
+                src.disconnect();
+            } catch (e) {}
+        }
+        this.ambientSources = [];
+    }
+
+    // =========================
+    // MONSTRO (toca evento que desativa os outros sons enquanto durar)
+    // =========================
+    playMonsterNow() {
+        const list = [this._resolveName('som-monstro'), this._resolveName('som2-monstro')];
+        const key = list[this.monsterIndex % list.length];
+        this.monsterIndex++;
+
+        const buffer = this.buffers[key];
+        if (!buffer) return;
+        // toca o grunhido do monstro sem silenciar outros canais
+        const src = this.context.createBufferSource();
+        src.buffer = buffer;
+        src.connect(this.monsterGain);
+        src.start(0);
+
+        src.onended = () => {
+            try { src.disconnect(); } catch (e) {}
+        };
+    }
+
+    startMonsterEvents(intervalMs = 45000) {
+        if (this.monsterIntervalId) return;
+        this.monsterIntervalId = setInterval(() => this.playMonsterNow(), intervalMs);
+    }
+
+    stopMonsterEvents() {
+        if (!this.monsterIntervalId) return;
+        clearInterval(this.monsterIntervalId);
+        this.monsterIntervalId = null;
     }
 
     _resolveName(name) {
