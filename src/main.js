@@ -273,6 +273,7 @@ async function init() {
   relogio.transform.ry = 180;
   const quadro = await factory.createFurniture("quadro", [roomInstance15.roomPosition[0]+10.0, roomInstance15.roomPosition[1]+5.0, roomInstance15.roomPosition[2]+59.0]);
   quadro.transform.ry = 180;
+  window.dispatchEvent(new Event("gameLoaded"));
 
   requestAnimationFrame(draw);
 }
