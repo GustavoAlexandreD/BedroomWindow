@@ -21,7 +21,9 @@ export class Cat extends Entity {
         this.targetY = position[1] + 6.0;     // Altura do topo da cama
         this.animState = "IDLE";               // Começa dormindo
         this.speed = 10.0;                     // Velocidade da subida
-        this.waitTimer = 0;                    
+        this.waitTimer = 0;
+        this.spinSpeed = 360.0; // Velocidade do giro
+        this.targetRy = 0; // Guarda o alvo final da rotação
     }
 
     interact() {
@@ -34,14 +36,27 @@ export class Cat extends Entity {
         if (!dt) return; 
 
         if (this.animState === "EMERGING") {
+            // Faz o gato subir
             this.transform.y += this.speed * dt;
+
             if (this.transform.y >= this.targetY) {
-                this.transform.y = this.targetY; 
+                this.transform.y = this.targetY;
+
+                this.animState = "SPINNING";
+                this.targetRy = this.transform.ry + 360.0;
+            }
+        }
+        else if (this.animState === "SPINNING") {
+            this.transform.ry += this.spinSpeed * dt;
+
+            if (this.transform.ry >= this.targetRy) {
+                this.transform.ry = this.targetRy;
+
                 this.animState = "MEOWING";
                 this.waitTimer = 2.0; // Fica 2 segundos miando
-                this._tocarSom3D("som-gato", { volume: 50.0 }); // Toca o som!
+                this._tocarSom3D("som-gato", { volume: 50.0 }); // Toca o som do gato!
             }
-        } 
+        }
         else if (this.animState === "MEOWING") {
             this.waitTimer -= dt;
             if (this.waitTimer <= 0) {
