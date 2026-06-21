@@ -53,7 +53,7 @@ export function updateCameraMovement(camera, input, deltaTime, collisionSystem, 
   // Se o sistema de colisão existir, ele filtra o nosso passo!
   if (collisionSystem) {
       // O tamanho físico do jogador (Largura X, Altura Y, Profundidade Z)
-      const playerSize = [5.0, 15.0, 5.0]; 
+      const playerSize = [14.0, 15.0, 14.0]; 
       
       // A função moveWithCollision impede a câmara de atravessar a mesa
       // deslizando-a pela parede (anti-tunneling)

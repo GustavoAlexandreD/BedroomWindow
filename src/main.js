@@ -273,6 +273,7 @@ async function init() {
   relogio.transform.ry = 180;
   const quadro = await factory.createFurniture("quadro", [roomInstance15.roomPosition[0]+10.0, roomInstance15.roomPosition[1]+5.0, roomInstance15.roomPosition[2]+59.0]);
   quadro.transform.ry = 180;
+  const lamparina = await factory.createFurniture("lamparina", [0.0, 0.0, 0.0])
   window.dispatchEvent(new Event("gameLoaded"));
 
   requestAnimationFrame(draw);
@@ -291,7 +292,12 @@ function initGL() {
     varying vec2 v_texCoord;
     uniform sampler2D tex;
     void main() {
-      gl_FragColor = texture2D(tex, v_texCoord);
+      vec4 texColor = texture2D(tex, v_texCoord);
+      
+      // O brilho laranja/fogo misturado no metal
+      vec3 fireGlow = vec3(1.0, 0.42, 0.1) * 0.2; 
+      
+      gl_FragColor = vec4(texColor.rgb + fireGlow, texColor.a);
     }
   `;
 
@@ -395,6 +401,10 @@ function draw(time = 0) {
   // A movimentação da câmara original volta a funcionar corretamente
   updateCameraMovement(camera, input, deltaTime, collisionSystem, windowsPosition);
 
+  const offsetRight = 4.0;  
+  const offsetDown = -1.0;
+  const offsetForward = 6.0;
+
   // atualiza listener 3D para o áudio (posição e direção do jogador)
   if (audioManager) {
     const forward = [
@@ -418,6 +428,18 @@ function draw(time = 0) {
     const program = obj.isLightSource ? lightProg : prog;
     gl.useProgram(program);
 
+    let currentView = view;
+    let currentWorldTransform = worldTransform;
+
+    if (obj.id && obj.id.includes("lamparina")) {
+      currentView = Math3D.lookat([0, FIXED_CAMERA_HEIGHT, 0], [0, FIXED_CAMERA_HEIGHT, -1], [0, 1, 0]);
+      currentWorldTransform = Math3D.translationMatrix(0, 0, 0);
+
+      obj.transform.x = offsetRight;
+      obj.transform.y = FIXED_CAMERA_HEIGHT + offsetDown;
+      obj.transform.z = -offsetForward;
+    }
+
     gl.uniformMatrix4fv(
       gl.getUniformLocation(program, "projection"),
       false,
@@ -426,7 +448,7 @@ function draw(time = 0) {
     gl.uniformMatrix4fv(
       gl.getUniformLocation(program, "view"),
       false,
-      view
+      currentView
     );
 
     gl.bindBuffer(gl.ARRAY_BUFFER, obj.buffer);
@@ -454,9 +476,9 @@ function draw(time = 0) {
       // Use a posição da câmera fixa como fonte de luz dinâmica
       gl.uniform3f(
         gl.getUniformLocation(program, "u_lightPosDynamic"),
-        0.0,
-        FIXED_CAMERA_HEIGHT,
-        0.0
+        offsetRight,
+        FIXED_CAMERA_HEIGHT + offsetDown,
+        -offsetForward
       );
       // Envia o raio da luz do jogador
       gl.uniform1f(
@@ -530,7 +552,7 @@ function draw(time = 0) {
 
     // Depois junta a Translação com o resultado anterior (Ordem T * R * S)
     const model = Math3D.multiply(matT, matRS);
-    const worldModel = Math3D.multiply(worldTransform, model);
+    const worldModel = Math3D.multiply(currentWorldTransform, model);
 
     gl.uniformMatrix4fv(
       gl.getUniformLocation(program, "transf"),

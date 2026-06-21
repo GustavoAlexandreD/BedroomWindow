@@ -54,6 +54,15 @@ export class EntityFactory {
                 color: [1.0, 0.0, 0.0, 1.0],
                 scale: 10.0,
                 boxSize: [10.0, 10.0, 10.0]
+            },
+            "lamparina": {
+                nome:"Lamparina",
+                objPath: "assets/models/Lantern_01_1k.obj",
+                texPath: "assets/textures/Lantern_01_brass_diff_1k.jpg",
+                flipY: false,
+                scale: 5.0,
+                boxSize: null,
+                isLightSource: true
             }
             // Adicione os monstros aqui seguindo o mesmo padrão
         };
@@ -128,6 +137,12 @@ export class EntityFactory {
         // Se o blueprint tiver uma cor sólida, injetamos a cor nos dados de desenho!
         if (bp.color) {
             drawData.color = bp.color;
+        }
+
+        drawData.id = id;
+
+        if (bp.isLightSource) {
+            drawData.isLightSource = true;
         }
 
         this.sceneObjects.push(drawData);
