@@ -63,6 +63,14 @@ export class EntityFactory {
                 scale: 5.0,
                 boxSize: null,
                 isLightSource: true
+            },
+            "porta": {
+                name:"Porta",
+                objPath: "assets/models/door.obj",
+                color: [1.0, 1.0, 0.8, 1.0],
+                flipY: false,
+                scale: 35.0,
+                boxSize: [5.0, 20.0, 5.0]
             }
             // Adicione os monstros aqui seguindo o mesmo padrão
         };

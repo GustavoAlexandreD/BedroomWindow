@@ -48,12 +48,6 @@ async function init() {
   // Configura o input do jogador (mouse e teclado)
   setupInput();
 
-  const roomImg = await Utils.loadImage("assets/textures/dark-grunge-texture.jpg");
-  const outsideImg = await Utils.loadImage("assets/textures/grama.jpg");
-
-  const roomTexture = Utils.createWebGLTexture(gl, roomImg);
-  const outsideTexture = Utils.createWebGLTexture(gl, outsideImg);
-
   // Configura a cena (Câmera, objetos, colisões, etc)
   camera = createCamera();
 
@@ -64,10 +58,17 @@ async function init() {
   // Inicia o gerenciador de áudio (carrega assets definidos em src/audio/audio-manager.js)
   audioManager = new AudioManager();
   await audioManager.ready;
-  // inicia os loops de ambiência (não inicia BGM—música principal é gerenciada pelas telas/menu)
+  // Inicia os loops de ambiência (não inicia BGM—música principal é gerenciada pelas telas/menu)
   audioManager.startAmbience();
-  // inicia eventos do monstro a cada 45s (alternando os dois sons)
+  // Inicia eventos do monstro a cada 45s (alternando os dois sons)
   audioManager.startMonsterEvents(45000);
+
+  //Inicializa as texturas do quarto e cenário externo  
+  const roomImg = await Utils.loadImage("assets/textures/dark-grunge-texture.jpg");
+  const outsideImg = await Utils.loadImage("assets/textures/grama.jpg");
+
+  const roomTexture = Utils.createWebGLTexture(gl, roomImg);
+  const outsideTexture = Utils.createWebGLTexture(gl, outsideImg);
 
   // Quartos (Desenho por código + caixas de colisão)
   const roomInstance1 = new Room([0,0,0], [0,0], [0,0], [0,0], [2,2]);
@@ -263,8 +264,8 @@ async function init() {
   await factory.preloadAll();
 
   // 3. Spawna os objetos pelo mapa de forma instantânea (porque já estão no cache)
-  const mesa = await factory.createFurniture("mesa_cabeceira", [roomInstance15.roomPosition[0]+10.0, roomInstance15.roomPosition[1]-10.0, roomInstance15.roomPosition[2]+52.0]);
-  mesa.transform.ry = 180;
+  const mesa_cabeceira = await factory.createFurniture("mesa_cabeceira", [roomInstance15.roomPosition[0]+10.0, roomInstance15.roomPosition[1]-10.0, roomInstance15.roomPosition[2]+52.0]);
+  mesa_cabeceira.transform.ry = 180;
   const camaGotica = await factory.createFurniture("cama", [roomInstance15.roomPosition[0]+50.0, roomInstance15.roomPosition[1]-5.0, roomInstance15.roomPosition[2]+42.0]);
   camaGotica.transform.ry = 180;
   const gato = await factory.createFurniture("gato", [roomInstance15.roomPosition[0]+50.0, roomInstance15.roomPosition[1]-13.0, roomInstance15.roomPosition[2]+42.0]);
@@ -273,8 +274,10 @@ async function init() {
   relogio.transform.ry = 180;
   const quadro = await factory.createFurniture("quadro", [roomInstance15.roomPosition[0]+10.0, roomInstance15.roomPosition[1]+5.0, roomInstance15.roomPosition[2]+59.0]);
   quadro.transform.ry = 180;
-  const lamparina = await factory.createFurniture("lamparina", [0.0, 0.0, 0.0])
+  const lamparina = await factory.createFurniture("lamparina", [0.0, 0.0, 0.0]);
+  const porta = await factory.createFurniture("porta", [roomInstance2.roomPosition[0], roomInstance2.roomPosition[1], roomInstance2.roomPosition[2]-62.5]);
   window.dispatchEvent(new Event("gameLoaded"));
+  
 
   requestAnimationFrame(draw);
 }

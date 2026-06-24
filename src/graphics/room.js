@@ -57,7 +57,7 @@ export class Room{
                 }
             }else if(this.walls[i].type === 1){
                 wBottom = 0.0;
-                let doorWidth = 20.0;
+                let doorWidth = 13.0;
                 let wallWidth = (width - doorWidth) / 2;
                 // Parede com porta
                 switch(i){
