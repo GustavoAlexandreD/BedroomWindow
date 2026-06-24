@@ -35,7 +35,7 @@ Para atender aos requisitos da disciplina, a arquitetura foi cuidadosamente estr
 
 ### 3. **Transformações Geométricas 3D**
 - **Matrizes de Transformação (`src/utils/math.js`):** Implementação de matrizes 4x4 para translação, rotação e escala.
-- **Objetos Animados:** Aplicação contínua de transformações (rotação em torno de eixos, oscilação de posição, variação de escala).
+- **Objetos Animados:** Aplicação de transformações através de interações(rotação em torno de eixos, oscilação de posição, variação de escala).
 - **Model-View-Projection (MVP):** Pipeline completo de transformação do espaço local para espaço de tela.
 
 ### 4. **Texturização 3D e Mapeamento UV**
@@ -200,8 +200,8 @@ http-server
 | **Mover para esquerda** | A ou Seta ← |
 | **Mover para direita** | D ou Seta → |
 | **Rotacionar câmera** | Mouse (mover) |
-| **Pausar** | P ou ESC |
-| **Menu Principal** | ESC (durante o jogo) |
+| **Evento supresa** | F |
+***OBS*** | A tecla  F proporciona um evento surpresa quando acionada próxima a cama do quarto final! |
 
 ---
 
@@ -219,8 +219,7 @@ http-server
   - Cálculo de ambient, diffuse e specular
 
 - **III) Pelo menos um objeto animado:**
-  - Objetos giram continuamente
-  - Alterações de escala (pulsação)
+  - Objeto giram continuamente
   - Translação em trajetória
 
 - **IV) Pelo menos um objeto com textura:**
