@@ -402,7 +402,7 @@ function draw(time = 0) {
   updateCameraMovement(camera, input, deltaTime, collisionSystem, windowsPosition);
 
   const offsetRight = 4.0;  
-  const offsetDown = -1.0;
+  const offsetDown = -4.0;
   const offsetForward = 6.0;
 
   // atualiza listener 3D para o áudio (posição e direção do jogador)
