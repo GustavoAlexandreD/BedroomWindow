@@ -1,6 +1,6 @@
-import { Entity } from "./entity.js"
+import { Object} from "./entity.js"
 
-export class Cat extends Entity {
+export class Cat extends Object{
     constructor(id, name, position, renderableData, texture, audioManager, scale = 1.0, boxSize = [10.0, 10.0, 10.0]) {
         super({ id, name, position, audioManager });
         

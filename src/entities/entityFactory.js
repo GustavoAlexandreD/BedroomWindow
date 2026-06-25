@@ -1,4 +1,5 @@
 import { Furniture } from "./furniture.js";
+import { Door } from "./door.js";
 import { OBJLoader } from "../models/obj-loader.js";
 import { TextureLoader } from "../graphics/texture-loader.js";
 import { createRenderable } from "../graphics/renderer.js";
@@ -161,7 +162,8 @@ export class EntityFactory {
                 objPath: "assets/models/door.obj",
                 color: [1.0, 1.0, 0.8, 1.0],
                 scale: 35.0,
-                boxSize: [5.0, 20.0, 5.0]
+                // boxSize: [5.0, 20.0, 5.0]
+                boxSize: null
             }
             // Adicione os monstros aqui seguindo o mesmo padrão
         };
@@ -215,16 +217,22 @@ export class EntityFactory {
         const bp = this.blueprints[type];
         const id = `${type}-${Date.now()}`;
         let entity = null;
-        if (type == "gato") {
-            entity = new Cat (
-                id, bp.name, position, 
+        if (type === "gato") {
+            entity = new Cat(
+                id, bp.name, position,
                 assets.renderable, assets.texture, this.audioManager,
                 bp.scale, bp.boxSize
-            )
+            );
+        } else if (type === "porta") {
+            entity = new Door(
+                id, bp.name, position,
+                assets.renderable, assets.texture, this.audioManager,
+                bp.scale, bp.boxSize
+            );
         } else {
             entity = new Furniture(
-                id, bp.name, position, 
-                assets.renderable, assets.texture, 
+                id, bp.name, position,
+                assets.renderable, assets.texture,
                 bp.scale, bp.boxSize
             );
         }

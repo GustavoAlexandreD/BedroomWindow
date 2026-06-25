@@ -12,12 +12,16 @@ import { EntityManager } from "./game/entity-manager.js";
 import { CollisionSystem } from "./game/collision.js"
 import { EntityFactory } from "./entities/entityFactory.js";
 import { AudioManager } from "./audio/audio-manager.js";
+import { verificaLimites } from "./utils/helpers.js";
 
 //Variáveis globais
 let gl, prog, lightProg;
 let sceneObjects = [];
 let collisionSystem;
 let entityManager;
+let doorPositions = [];
+let doorEntities = [];
+let pistasPositions = [];
 
 // Câmera
 let camera;
@@ -265,6 +269,9 @@ async function init() {
 
   // 3. Spawna os objetos pelo mapa de forma instantânea (porque já estão no cache)
 
+  //Lampião do jogador
+  const lamparina = await factory.createFurniture("lamparina", [0.0, 0.0, 0.0]);
+
   //Objetos do Quarto 1
   const sofa = await factory.createFurniture("sofa", [roomInstance1.roomPosition[0], roomInstance1.roomPosition[1]-5.0, roomInstance1.roomPosition[2]+52.0]);
   sofa.transform.ry = 90;
@@ -349,8 +356,44 @@ async function init() {
   papel_13.transform.ry = 180;
   const livros_7 = await factory.createFurniture("livros", [roomInstance15.roomPosition[0]+40.0, roomInstance15.roomPosition[1]-12.0, roomInstance15.roomPosition[2]-45.0]);
 
-  const lamparina = await factory.createFurniture("lamparina", [0.0, 0.0, 0.0]);
+  //Portas
   const porta = await factory.createFurniture("porta", [roomInstance2.roomPosition[0], roomInstance2.roomPosition[1], roomInstance2.roomPosition[2]-62.5]);
+  const porta_1 = await factory.createFurniture("porta", [roomInstance3.roomPosition[0]-62.5, roomInstance3.roomPosition[1], roomInstance3.roomPosition[2]]);
+  porta_1.transform.ry = 90;
+  const porta_2 = await factory.createFurniture("porta", [roomInstance5.roomPosition[0]-62.5, roomInstance5.roomPosition[1], roomInstance5.roomPosition[2]]);
+  porta_2.transform.ry = 90;
+  const porta_3 = await factory.createFurniture("porta", [roomInstance9.roomPosition[0], roomInstance9.roomPosition[1], roomInstance9.roomPosition[2]-62.5]);
+  const porta_4 = await factory.createFurniture("porta", [roomInstance10.roomPosition[0], roomInstance10.roomPosition[1], roomInstance10.roomPosition[2]-62.5]);
+  const porta_5 = await factory.createFurniture("porta", [roomInstance13.roomPosition[0]-62.5, roomInstance13.roomPosition[1], roomInstance13.roomPosition[2]]);
+  porta_5.transform.ry = 90;
+  const porta_6 = await factory.createFurniture("porta", [roomInstance7.roomPosition[0], roomInstance7.roomPosition[1], roomInstance7.roomPosition[2]-62.5]);
+  const porta_7 = await factory.createFurniture("porta", [roomInstance12.roomPosition[0], roomInstance12.roomPosition[1], roomInstance12.roomPosition[2]-62.5]);
+  const porta_8 = await factory.createFurniture("porta", [roomInstance16.roomPosition[0]+62.5, roomInstance16.roomPosition[1], roomInstance16.roomPosition[2]]);
+  porta_8.transform.ry = 90;
+  const porta_9 = await factory.createFurniture("porta", [roomInstance4.roomPosition[0], roomInstance4.roomPosition[1], roomInstance4.roomPosition[2]-62.5]);
+
+  doorEntities.push(porta, porta_1, porta_2, porta_3, porta_4, porta_5, porta_6, porta_7, porta_8, porta_9);
+
+  //Armazenando as posições para verificar quando for abrir portas ou pegar pistas
+  pistasPositions.push(
+    [roomInstance1.roomPosition[0]-45.0, roomInstance1.roomPosition[1]-14.5, roomInstance1.roomPosition[2]-25.0], 
+    [roomInstance7.roomPosition[0], roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]], 
+    [roomInstance9.roomPosition[0], roomInstance9.roomPosition[1]-14.5, roomInstance9.roomPosition[2]], 
+    [roomInstance15.roomPosition[0], roomInstance15.roomPosition[1]-14.5, roomInstance15.roomPosition[2]]
+  );
+
+  doorPositions.push(
+    [roomInstance2.roomPosition[0], roomInstance2.roomPosition[1], roomInstance2.roomPosition[2]-62.5], 
+    [roomInstance3.roomPosition[0]-62.5, roomInstance3.roomPosition[1], roomInstance3.roomPosition[2]], 
+    [roomInstance5.roomPosition[0]-62.5, roomInstance5.roomPosition[1], roomInstance5.roomPosition[2]], 
+    [roomInstance9.roomPosition[0], roomInstance9.roomPosition[1], roomInstance9.roomPosition[2]-62.5], 
+    [roomInstance10.roomPosition[0], roomInstance10.roomPosition[1], roomInstance10.roomPosition[2]-62.5], 
+    [roomInstance13.roomPosition[0]-62.5, roomInstance13.roomPosition[1], roomInstance13.roomPosition[2]], 
+    [roomInstance7.roomPosition[0], roomInstance7.roomPosition[1], roomInstance7.roomPosition[2]-62.5],
+    [roomInstance12.roomPosition[0], roomInstance12.roomPosition[1], roomInstance12.roomPosition[2]-62.5],
+    [roomInstance16.roomPosition[0]+62.5, roomInstance16.roomPosition[1], roomInstance16.roomPosition[2]],
+    [roomInstance4.roomPosition[0], roomInstance4.roomPosition[1], roomInstance4.roomPosition[2]-62.5]
+  );
 
   window.dispatchEvent(new Event("gameLoaded"));
   
@@ -405,6 +448,20 @@ function setupInput() {
   document.addEventListener("mousemove", e => {
     if (document.pointerLockElement === canvas) {
       updateCameraLook(camera, e.movementX, e.movementY);
+    }
+  });
+
+  window.addEventListener("mousedown", e => {
+    for (const door of doorEntities) {
+      if (verificaLimites(
+          camera.position[0], camera.position[1], camera.position[2],
+          door.transform.x, door.transform.y, door.transform.z
+      )) {
+        if (typeof door.toggle === "function") {
+          door.toggle();
+        }
+        break;
+      }
     }
   });
 
@@ -614,7 +671,7 @@ function draw(time = 0) {
 
     }
 
-    const matS = Math3D.scaleMatrix(
+    let matS = Math3D.scaleMatrix(
       obj.transform.scale,
       obj.transform.scale,
       obj.transform.scale
@@ -633,7 +690,7 @@ function draw(time = 0) {
     matRS = Math3D.multiply(matRY, matRS);
     matRS = Math3D.multiply(matRZ, matRS);
 
-    // Depois junta a Translação com o resultado anterior (Ordem T * R * S)
+        // Depois junta a Translação com o resultado anterior (Ordem T * R * S)
     const model = Math3D.multiply(matT, matRS);
     const worldModel = Math3D.multiply(currentWorldTransform, model);
 

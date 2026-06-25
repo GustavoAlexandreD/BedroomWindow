@@ -1,6 +1,6 @@
-import { Entity } from "./entity.js"
+import { Object} from "./entity.js"
 
-export class Furniture extends Entity {
+export class Furniture extends Object{
     constructor(id, name, position, renderableData, texture, scale = 1.0, boxSize = [10.0, 10.0, 10.0]) {
         super({ id, name, position })
         

@@ -1,6 +1,6 @@
-import { Entity } from "./entity.js";
+import { Object} from "./entity.js";
 
-export class Monster extends Entity {
+export class Monster extends Object{
     constructor(deps = {}) {
         super({ name: "monster", ...deps });
         this.noiseIntervalMs = 1200;

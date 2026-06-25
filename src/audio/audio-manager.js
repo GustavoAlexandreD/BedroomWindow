@@ -30,8 +30,7 @@ export class AudioManager {
             monster: "som-monstro",
             glassBreak: "vidro-quebrando",
             rain: "som-chuva-janela",
-            cat: "som-gato",
-            owl: "som-coruja"
+            cat: "som-gato"
         };
 
         this.buffers = {};
@@ -347,8 +346,6 @@ export class AudioManager {
         const map = {
             cat: "som-gato",
             gato: "som-gato",
-            owl: "som-coruja",
-            coruja: "som-coruja",
             monster: "som-monstro",
             monstro: "som-monstro"
         };

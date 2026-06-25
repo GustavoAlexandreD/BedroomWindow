@@ -7,7 +7,7 @@ import { irParaGameOver } from "../menu_e_gameover/gameover.js";
  * - iniciarBarulhoTemporizado()
  * - iniciarQuebraJanelaTemporizada()
  */
-export class Entity {
+export class Object{
     constructor({
         id,
         name,
@@ -16,8 +16,8 @@ export class Entity {
         windowSystem = null,
         gameState = null
     } = {}) {
-        if (new.target === Entity) {
-            throw new Error("Entity é abstrata e não pode ser instanciada diretamente.");
+        if (new.target === Object) {
+            throw new Error("Object é abstrata e não pode ser instanciada diretamente.");
         }
 
         this.id = id ?? `entity-${Date.now()}`;
