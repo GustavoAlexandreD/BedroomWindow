@@ -1,5 +1,6 @@
 import { Furniture } from "./furniture.js";
 import { Door } from "./door.js";
+import { Paper } from "./papers.js";
 import { OBJLoader } from "../models/obj-loader.js";
 import { TextureLoader } from "../graphics/texture-loader.js";
 import { createRenderable } from "../graphics/renderer.js";
@@ -71,7 +72,7 @@ export class EntityFactory {
                 texPath: "assets/textures/couch_fabric.jpg",
                 flipY: false,
                 scale: 40.0,
-                boxSize: [40.0, 20.0, 10.0]
+                boxSize: [15.0, 20.0, 15.0]
             },
             "armario": {
                 nome:"Armario",
@@ -227,6 +228,13 @@ export class EntityFactory {
             entity = new Door(
                 id, bp.name, position,
                 assets.renderable, assets.texture, this.audioManager,
+                bp.scale, bp.boxSize
+            );
+        } else if (type === "papeis" || type === "papeis_1" || type === "papeis_2") {
+            entity = new Paper(
+                id, bp.name, position,
+                assets.renderable, assets.texture,
+                this.audioManager,
                 bp.scale, bp.boxSize
             );
         } else {

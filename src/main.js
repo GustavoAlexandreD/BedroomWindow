@@ -19,9 +19,8 @@ let gl, prog, lightProg;
 let sceneObjects = [];
 let collisionSystem;
 let entityManager;
-let doorPositions = [];
 let doorEntities = [];
-let pistasPositions = [];
+let pistasEntities = [];
 
 // Câmera
 let camera;
@@ -40,7 +39,7 @@ const input = {
 
 // Luz dinâmica do jogador (Lampião)
 const dynamicLightColor = [1.0, 0.42, 0.1]; // Ajuste aqui para mudar a cor da luz
-const InitialplayerLightRadius = 90.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
+const InitialplayerLightRadius = 120.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
 let playerLightRadius; // Variável que será animada ao longo do tempo
 
 // Função de inicialização (Carrega texturas, modelos, configura a cena, etc)
@@ -294,25 +293,10 @@ async function init() {
   papel_1.transform.ry = 180;
   const papel_2 = await factory.createFurniture("papeis_2", [roomInstance1.roomPosition[0]-40.0, roomInstance1.roomPosition[1]-3.0, roomInstance1.roomPosition[2]+52.0]);
   papel_2.transform.ry = 180;
-  const janela_bloqueio = await factory.createFurniture("janela_block", [roomInstance1.roomPosition[0]-58.0, roomInstance1.roomPosition[1]+7.0, roomInstance1.roomPosition[2]+23.0]);
+  const janela_bloqueio = await factory.createFurniture("janela_block", [roomInstance1.roomPosition[0]-58.0, roomInstance1.roomPosition[1]+7.0, roomInstance1.roomPosition[2]-23.0]);
   janela_bloqueio.transform.ry = 90;
 
   //Objetos do Quarto 2
-  const mesa_jantar = await factory.createFurniture("mesa_jantar", [roomInstance7.roomPosition[0], roomInstance7.roomPosition[1]+25.0, roomInstance7.roomPosition[2]]);
-  mesa_jantar.transform.rx = 180;
-  mesa_jantar.transform.ry = 90;
-  const fogao = await factory.createFurniture("fogao", [roomInstance7.roomPosition[0]-56.0, roomInstance7.roomPosition[1]+12.0, roomInstance7.roomPosition[2]+45.0]);
-  fogao.transform.rx = 180;
-  fogao.transform.ry = 270;
-  const pista_2 = await factory.createFurniture("papeis", [roomInstance7.roomPosition[0], roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]]);
-  const papel_3 = await factory.createFurniture("papeis", [roomInstance7.roomPosition[0]-35.0, roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]-35.0]);
-  papel_3.transform.ry = 180;
-  const papel_4 = await factory.createFurniture("papeis_1", [roomInstance7.roomPosition[0]+35.0, roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]+25.0]);
-  papel_4.transform.ry = 180;
-  const papel_5 = await factory.createFurniture("papeis_2", [roomInstance7.roomPosition[0]-40.0, roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]+52.0]);
-  papel_5.transform.ry = 180;
-  
-  //Objetos do Quarto 3
   const mesa_escritorio = await factory.createFurniture("mesa", [roomInstance9.roomPosition[0]-40.0, roomInstance9.roomPosition[1]-10.0, roomInstance9.roomPosition[2]-45.0]);
   mesa_escritorio.transform.rx = 180;
   mesa_escritorio.transform.ry = 34;
@@ -321,7 +305,7 @@ async function init() {
   const armario4 = await factory.createFurniture("armario", [roomInstance9.roomPosition[0]+35.0, roomInstance9.roomPosition[1]-10.0, roomInstance9.roomPosition[2]-35.0]);
   armario4.transform.rx = 90;
   armario4.transform.ry = 45;
-  const pista_3 = await factory.createFurniture("papeis", [roomInstance9.roomPosition[0], roomInstance9.roomPosition[1]-14.5, roomInstance9.roomPosition[2]]);
+  const pista_2 = await factory.createFurniture("papeis", [roomInstance9.roomPosition[0], roomInstance9.roomPosition[1]-14.5, roomInstance9.roomPosition[2]]);
   const papel_6 = await factory.createFurniture("papeis", [roomInstance9.roomPosition[0]-35.0, roomInstance9.roomPosition[1]-14.5, roomInstance9.roomPosition[2]+35.0]);
   papel_6.transform.ry = 180;
   const papel_7 = await factory.createFurniture("papeis_1", [roomInstance9.roomPosition[0]+35.0, roomInstance9.roomPosition[1]-14.5, roomInstance9.roomPosition[2]+25.0]);
@@ -333,6 +317,21 @@ async function init() {
   const livros_6 = await factory.createFurniture("livros", [roomInstance9.roomPosition[0]-40.0, roomInstance9.roomPosition[1]-12.0, roomInstance9.roomPosition[2]+45.0]);
   const cadeira = await factory.createFurniture("cadeira", [roomInstance9.roomPosition[0]-40.0, roomInstance9.roomPosition[1]-8.0, roomInstance9.roomPosition[2]-5.0]);
   cadeira.transform.ry = 295;
+
+  //Objetos do Quarto 3
+  const mesa_jantar = await factory.createFurniture("mesa_jantar", [roomInstance7.roomPosition[0], roomInstance7.roomPosition[1]+25.0, roomInstance7.roomPosition[2]]);
+  mesa_jantar.transform.rx = 180;
+  mesa_jantar.transform.ry = 90;
+  const fogao = await factory.createFurniture("fogao", [roomInstance7.roomPosition[0]-56.0, roomInstance7.roomPosition[1]+12.0, roomInstance7.roomPosition[2]+45.0]);
+  fogao.transform.rx = 180;
+  fogao.transform.ry = 270;
+  const pista_3 = await factory.createFurniture("papeis", [roomInstance7.roomPosition[0], roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]]);
+  const papel_3 = await factory.createFurniture("papeis", [roomInstance7.roomPosition[0]-35.0, roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]-35.0]);
+  papel_3.transform.ry = 180;
+  const papel_4 = await factory.createFurniture("papeis_1", [roomInstance7.roomPosition[0]+35.0, roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]+25.0]);
+  papel_4.transform.ry = 180;
+  const papel_5 = await factory.createFurniture("papeis_2", [roomInstance7.roomPosition[0]-40.0, roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]+52.0]);
+  papel_5.transform.ry = 180;
 
   //Objetos do Quarto 4
   const mesa_cabeceira = await factory.createFurniture("mesa_cabeceira", [roomInstance15.roomPosition[0]+10.0, roomInstance15.roomPosition[1]-10.0, roomInstance15.roomPosition[2]+52.0]);
@@ -377,7 +376,7 @@ async function init() {
   const porta_10 = await factory.createFurniture("porta", [roomInstance8.roomPosition[0]+60, roomInstance8.roomPosition[1], roomInstance8.roomPosition[2]]);
   porta_10.transform.ry = 90;
   const porta_11 = await factory.createFurniture("porta", [roomInstance10.roomPosition[0]-60, roomInstance10.roomPosition[1], roomInstance10.roomPosition[2]]);
-  porta_11.transform.ry = 90;
+  porta_11.transform.ry = 270;
   const porta_12 = await factory.createFurniture("porta", [roomInstance5.roomPosition[0]+60, roomInstance5.roomPosition[1], roomInstance5.roomPosition[2]]);
   const porta_13 = await factory.createFurniture("porta", [roomInstance11.roomPosition[0], roomInstance11.roomPosition[1], roomInstance11.roomPosition[2]-60]);
   porta_12.transform.ry = 90;
@@ -389,28 +388,16 @@ async function init() {
   const janela_bloqueio_3 = await factory.createFurniture("janela_block", [roomInstance6.roomPosition[0]-58.0, roomInstance6.roomPosition[1]+7.0, roomInstance6.roomPosition[2]-35.0]);
   janela_bloqueio_3.transform.ry = 90;
 
-  doorEntities.push(porta, porta_1, porta_2, porta_3, porta_4, porta_5, porta_6, porta_7, porta_8, porta_9, porta_10, porta_11, porta_12, porta_13);
+  //Organização das pistas
+  pista_1.setClueId("pista_1");
+  pista_2.setClueId("pista_2");
+  pista_3.setClueId("pista_3");
+  pista_4.setClueId("pista_4");
 
   //Armazenando as posições para verificar quando for abrir portas ou pegar pistas
-  pistasPositions.push(
-    [roomInstance1.roomPosition[0]-45.0, roomInstance1.roomPosition[1]-14.5, roomInstance1.roomPosition[2]-25.0], 
-    [roomInstance7.roomPosition[0], roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]], 
-    [roomInstance9.roomPosition[0], roomInstance9.roomPosition[1]-14.5, roomInstance9.roomPosition[2]], 
-    [roomInstance15.roomPosition[0], roomInstance15.roomPosition[1]-14.5, roomInstance15.roomPosition[2]]
-  );
 
-  doorPositions.push(
-    [roomInstance2.roomPosition[0], roomInstance2.roomPosition[1], roomInstance2.roomPosition[2]-62.5], 
-    [roomInstance3.roomPosition[0]-62.5, roomInstance3.roomPosition[1], roomInstance3.roomPosition[2]], 
-    [roomInstance5.roomPosition[0]-62.5, roomInstance5.roomPosition[1], roomInstance5.roomPosition[2]], 
-    [roomInstance9.roomPosition[0], roomInstance9.roomPosition[1], roomInstance9.roomPosition[2]-62.5], 
-    [roomInstance10.roomPosition[0], roomInstance10.roomPosition[1], roomInstance10.roomPosition[2]-62.5], 
-    [roomInstance13.roomPosition[0]-62.5, roomInstance13.roomPosition[1], roomInstance13.roomPosition[2]], 
-    [roomInstance7.roomPosition[0], roomInstance7.roomPosition[1], roomInstance7.roomPosition[2]-62.5],
-    [roomInstance12.roomPosition[0], roomInstance12.roomPosition[1], roomInstance12.roomPosition[2]-62.5],
-    [roomInstance16.roomPosition[0]+62.5, roomInstance16.roomPosition[1], roomInstance16.roomPosition[2]],
-    [roomInstance4.roomPosition[0], roomInstance4.roomPosition[1], roomInstance4.roomPosition[2]-62.5]
-  );
+  doorEntities.push(porta, porta_1, porta_2, porta_3, porta_4, porta_5, porta_6, porta_7, porta_8, porta_9, porta_10, porta_11, porta_12, porta_13);
+  pistasEntities.push(pista_1, pista_2, pista_3, pista_4);
 
   window.dispatchEvent(new Event("gameLoaded"));
   
@@ -480,6 +467,17 @@ function setupInput() {
         break;
       }
     }
+    for (const pista of pistasEntities) {
+      if (verificaLimites(
+          camera.position[0], camera.position[1], camera.position[2],
+          pista.transform.x, pista.transform.y, pista.transform.z
+      )) {
+        if (typeof pista.toggle === "function") {
+          pista.toggle();
+        }
+        break;
+      }
+    }
   });
 
   window.addEventListener("keydown", e => {
@@ -510,7 +508,7 @@ function draw(time = 0) {
   lastTime = time;
   
   // Lógica para a diminuição do raio de luz do jogador
-  playerLightRadius = InitialplayerLightRadius - (time * 0.0003);
+  playerLightRadius = InitialplayerLightRadius - (time * 0.0002);
 
   //Verificação se o jogador está na janela de saída
   if (camera.position[0] >= -290 && camera.position[0] <= -195 && camera.position[2] >= -430 && camera.position[2] <= -425) {
@@ -519,7 +517,7 @@ function draw(time = 0) {
   }
 
   //Verificação se o fogo está fraco, se sim, o jogador é capturado pelo monstro
-  if (playerLightRadius <= 40.0) {
+  if (playerLightRadius <= 60.0) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
