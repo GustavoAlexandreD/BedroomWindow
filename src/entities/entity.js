@@ -50,13 +50,6 @@ export class Object{
     }
 
     /**
-     * (ABSTRATO) Função temporizada para quebrar janela + fim de jogo + barulho de vidro.
-     */
-    iniciarQuebraJanelaTemporizada() {
-        throw new Error(`${this.constructor.name} precisa sobrescrever iniciarQuebraJanelaTemporizada().`);
-    }
-
-    /**
      * Encerra timers da entidade.
      */
     dispose() {
@@ -74,69 +67,8 @@ export class Object{
         this.isActive = false;
     }
 
-    /**
-     * Tenta chamar uma função existente de barulho na janela
-     * sem acoplar em um nome único.
-     */
-    _fazerBarulhoNaJanelaExistente() {
-        const target = this.windowSystem;
-        if (!target) return false;
-
-        const candidates = [
-            "fazerBarulhoNaJanela",
-            "makeWindowNoise",
-            "playWindowNoise",
-            "triggerWindowNoise"
-        ];
-
-        for (const fnName of candidates) {
-            const fn = target[fnName];
-            if (typeof fn === "function") {
-                fn.call(target, this);
-                return true;
-            }
-        }
-        return false;
-    }
-
     _tocarSom3D(nomeSom, options = {}) {
         if (!this.audioManager || typeof this.audioManager.play3D !== "function") return;
         this.audioManager.play3D(nomeSom, this.position, options);
-    }
-
-    _tocarSomQuebraVidro() {
-        if (!this.audioManager) return;
-        if (typeof this.audioManager.play3D === "function") {
-            this.audioManager.play3D("vidro-quebrando", this.position, { refDistance: 2.0, maxDistance: 40 });
-        }
-    }
-
-    _quebrarJanelaEFimDeJogo() {
-        this.isBroken = true;
-        this._tocarSomQuebraVidro();
-
-        if (this.windowSystem) {
-            if (typeof this.windowSystem.breakWindow === "function") {
-                this.windowSystem.breakWindow(this);
-            } else if (typeof this.windowSystem.quebrarJanela === "function") {
-                this.windowSystem.quebrarJanela(this);
-            }
-        }
-
-        if (this.gameState) {
-            if (typeof this.gameState.gameOver === "function") {
-                this.gameState.gameOver();
-            } else if (typeof this.gameState.setGameOver === "function") {
-                this.gameState.setGameOver(true);
-            } else if (typeof this.gameState.ativo !== "undefined") {
-                this.gameState.ativo = false;
-            }
-        }
-
-        irParaGameOver({
-            motivo: "janela-quebrada",
-            entidade: this.name,
-            entidadeId: this.id
-        });
     }
 }

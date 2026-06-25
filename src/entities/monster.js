@@ -9,7 +9,6 @@ export class Monster extends Object{
 
     spawn() {
         this.isActive = true;
-        this._fazerBarulhoNaJanelaExistente();
         if (this.audioManager?.playEntitySpawn) {
             this.audioManager.playEntitySpawn("monster", this.position, {
                 refDistance: 2.5,

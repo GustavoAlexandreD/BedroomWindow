@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-**Bedroom Window** é um jogo 3D imersivo desenvolvido como avaliação para a disciplina de Computação Gráfica. O jogador explora um ambiente 3D em primeira pessoa, interagindo com objetos do mundo virtual dentro de um quarto. O grande diferencial deste projeto é a **construção completa utilizando WebGL puro** (sem bibliotecas gráficas de alto nível como Three.js).
+**Bedroom Window** é um jogo 3D imersivo desenvolvido como avaliação para a disciplina de Computação Gráfica. O jogador explora um ambiente 3D em primeira pessoa, interagindo com objetos do mundo virtual dentro de uma casa. O grande diferencial deste projeto é a **construção completa utilizando WebGL puro** (sem bibliotecas gráficas de alto nível como Three.js).
 
 Seguindo as restrições acadêmicas da disciplina, toda a renderização 3D foi implementada utilizando **OpenGL/WebGL ≥ 4.0**, com implementação própria de leitor de arquivos OBJ e um pipeline gráfico completo que inclui transformações geométricas, iluminação Phong e mapeamento de texturas.
 
@@ -13,7 +13,7 @@ Seguindo as restrições acadêmicas da disciplina, toda a renderização 3D foi
 - **Movimentação em Primeira Pessoa:** Navegação livre pelo ambiente utilizando WASD ou Setas.
 - **Interação com Câmera:** Controle de visão com mouse (rotação livre) para exploração completa do cenário.
 - **Sistema de Iluminação Dinâmico:** Implementação do modelo de reflexão de Phong com fontes de luz móveis que afetam a iluminação de todos os objetos em tempo real.
-- **Objetos Animados:** Transformações geométricas contínuas (rotação, escala, translação) aplicadas a objetos selecionados.
+- **Objetos Animados:** Transformações geométricas (rotação, escala, translação) aplicadas a objetos selecionados.
 - **Materiais Variados:** Combinação de objetos com texturas mapeadas e objetos com cores sólidas.
 - **Colisão Simples:** Prevenção de travessia de paredes durante a movimentação.
 
@@ -60,7 +60,7 @@ Para atender aos requisitos da disciplina, a arquitetura foi cuidadosamente estr
 - **Sem abstração gráfica:** Chamadas diretas ao WebGL, sem Three.js ou similares.
 
 ### 7. **Interação via Teclado e Mouse**
-- **Captura de Eventos:** Sistema de input responsivo para movimentação (W/A/S/D ou Setas) e rotação de câmera (Mouse).
+- **Captura de Eventos:** Sistema de input responsivo para movimentação (W/A/S/D ou Setas), rotação de câmera (Mouse) e interação com objetos (Clique do Mouse).
 - **Delta Time:** Implementação de frame rate independente para movimento suave independente da taxa de frames.
 
 ---
@@ -74,6 +74,13 @@ BedroomWindow/
 │
 ├── index.html                 # Página de entrada e menu principal
 ├── main.html                  # Página do jogo 3D
+├── tutorial.html              # Página de tutorial do jogo 3D
+├── historia.html              # Página de história inicial
+├── win.html                   # Página de vitória
+├── gameOver.html              # Página de game over
+├── bilhete.html               # Página contendo um bilhete misterioso
+├── README.md                  # README do projeto
+├── .gitignore                 # Gitignore do projeto
 │
 ├── css/                       # Estilos (não críticos para o jogo)
 │   └── styles.css
@@ -90,7 +97,7 @@ BedroomWindow/
     ├── utils/                 # 🔧 Utilitários
     │   ├── math.js            # Álgebra linear: vetores, matrizes 4x4, operações
     │   ├── webgl_utils.js     # Funções auxiliares para WebGL
-    │   └── helpers.js         # Funções gerais de helper
+    │   └── helpers.js         # Funções gerais utilitárias
     │
     ├── graphics/              # 🎨 MOTOR GRÁFICO (Pipeline Gráfico 3D)
     │   ├── renderer.js        # Gerenciador de renderização e estado WebGL
@@ -102,24 +109,30 @@ BedroomWindow/
     │   └── geometry_generator.js # Geração de primitivas geométricas
     │
     ├── models/                # 📦 MODELOS 3D
-    │   ├── obj-loader.js      # Leitor próprio de arquivos OBJ
-    │   ├── animations.js      # Definições de animações para objetos
-    │   └── geometry.js        # Geometrias pré-definidas
+    │   └── obj-loader.js      # Leitor próprio de arquivos OBJ
     │
     ├── game/                  # 🎮 LÓGICA DO JOGO
-    │   ├── game-loop.js       # Implementação do game loop
+    │   ├── collision.js       # Sistema simples de detecção de colisão
+    │   ├── entity-manager.js  # Implementação do gerenciamento dos objetos do jogo
     │   └── game-state.js      # Controle de estado do jogo
     │
-    ├── entities/              # 🎭 ENTIDADES DO JOGO
-    │   ├── player.js          # Controle e estado do jogador
-    │   └── interactive-objects.js # Objetos interativos da cena
+    ├── entities/              # 🎭 ENTIDADES/OBJETOS DO JOGO
+    │   ├── cat.js             # Controla a ação do gato
+    │   ├── door.js            # Controla a abertura e fechamento de portas
+    │   ├── entity.js          # Classe pai dos outros objetos
+    │   ├── entityFactory.js   # Fábrica de objetos em geral
+    │   ├── furniture.js       # Interface de móveis
+    │   ├── monster.js         # Controla a ação/som do monstro
+    │   └── papers.js          # Gerencia os papéis de pistas
     │
     ├── core/                  # ⚙️ NÚCLEO DO JOGO
-    │   └── collision-system.js # Sistema simples de detecção de colisão
+    │   ├── game-loop.js       # Gerencia o loop do jogo
+    │   ├── input-handler.js   # Gerencia a captura de eventos
+    │   ├── shader-manager.js  # Gerencia os shaders
+    │   └── webgl-context.js   # Gerencia o contexto WebGl
     │
-    ├── menu_e_gameover/       # 📋 INTERFACE
-    │   ├── menu.js            # Lógica do menu principal
-    │   └── pause-menu.js      # Lógica do menu de pausa
+    ├── gameover/       # 📋 INTERFACE
+    │   └── gameover.js      # Lógica do game over
     │
     └── audio/                 # 🔊 ÁUDIO
         └── audio-manager.js   # Gerenciamento de áudio e música
@@ -220,7 +233,7 @@ http-server
   - Cálculo de ambient, diffuse e specular
 
 - **III) Pelo menos um objeto animado:**
-  - Objeto giram continuamente
+  - Objeto gira quando há interação
   - Translação em trajetória
 
 - **IV) Pelo menos um objeto com textura:**
@@ -228,7 +241,6 @@ http-server
   - Objetos 3D carregados com texturas OBJ
 
 - **V) Pelo menos um objeto com cor sólida:**
-  - Paredes com cores sólidas
   - Objetos sem textura com material de cor única
 
 - **VI) Desenho exclusivamente com WebGL ≥ 4.0:**
@@ -237,7 +249,7 @@ http-server
 
 - **VII) Álgebra Linear (Math.js ou equivalent):**
   - `src/utils/math.js` implementa operações de álgebra linear
-  - Matrizes 4x4, vetores, quaternions
+  - Matrizes 4x4, vetores
 
 - **VIII) Canvas HTML5 + Eventos de teclado/mouse:**
   - Canvas criado em `main.html`
@@ -277,7 +289,7 @@ http-server
 | WebGL Puro | `src/graphics/renderer.js` | ✅ |
 | Leitor OBJ | `src/models/obj-loader.js` | ✅ |
 | Input Teclado/Mouse | `src/main.js` | ✅ |
-| Colisão | `src/core/collision-system.js` | ✅ |
+| Colisão | `src/game/collision.js` | ✅ |
 
 ---
 
