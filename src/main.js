@@ -357,6 +357,7 @@ async function init() {
   const livros_7 = await factory.createFurniture("livros", [roomInstance15.roomPosition[0]+40.0, roomInstance15.roomPosition[1]-12.0, roomInstance15.roomPosition[2]-45.0]);
 
   //Portas
+  //Verdadeiras
   const porta = await factory.createFurniture("porta", [roomInstance2.roomPosition[0], roomInstance2.roomPosition[1], roomInstance2.roomPosition[2]-62.5]);
   const porta_1 = await factory.createFurniture("porta", [roomInstance3.roomPosition[0]-62.5, roomInstance3.roomPosition[1], roomInstance3.roomPosition[2]]);
   porta_1.transform.ry = 90;
@@ -372,7 +373,23 @@ async function init() {
   porta_8.transform.ry = 90;
   const porta_9 = await factory.createFurniture("porta", [roomInstance4.roomPosition[0], roomInstance4.roomPosition[1], roomInstance4.roomPosition[2]-62.5]);
 
-  doorEntities.push(porta, porta_1, porta_2, porta_3, porta_4, porta_5, porta_6, porta_7, porta_8, porta_9);
+  //Falsas
+  const porta_10 = await factory.createFurniture("porta", [roomInstance8.roomPosition[0]+60, roomInstance8.roomPosition[1], roomInstance8.roomPosition[2]]);
+  porta_10.transform.ry = 90;
+  const porta_11 = await factory.createFurniture("porta", [roomInstance10.roomPosition[0]-60, roomInstance10.roomPosition[1], roomInstance10.roomPosition[2]]);
+  porta_11.transform.ry = 90;
+  const porta_12 = await factory.createFurniture("porta", [roomInstance5.roomPosition[0]+60, roomInstance5.roomPosition[1], roomInstance5.roomPosition[2]]);
+  const porta_13 = await factory.createFurniture("porta", [roomInstance11.roomPosition[0], roomInstance11.roomPosition[1], roomInstance11.roomPosition[2]-60]);
+  porta_12.transform.ry = 90;
+
+  //Bloqueios de Janelas
+  const janela_bloqueio_1 = await factory.createFurniture("janela_block", [roomInstance2.roomPosition[0]-58.0, roomInstance2.roomPosition[1]+7.0, roomInstance2.roomPosition[2]]);
+  janela_bloqueio_1.transform.ry = 90;
+  const janela_bloqueio_2 = await factory.createFurniture("janela_block", [roomInstance5.roomPosition[0], roomInstance5.roomPosition[1]+7.0, roomInstance5.roomPosition[2]-58.0]);
+  const janela_bloqueio_3 = await factory.createFurniture("janela_block", [roomInstance6.roomPosition[0]-58.0, roomInstance6.roomPosition[1]+7.0, roomInstance6.roomPosition[2]-35.0]);
+  janela_bloqueio_3.transform.ry = 90;
+
+  doorEntities.push(porta, porta_1, porta_2, porta_3, porta_4, porta_5, porta_6, porta_7, porta_8, porta_9, porta_10, porta_11, porta_12, porta_13);
 
   //Armazenando as posições para verificar quando for abrir portas ou pegar pistas
   pistasPositions.push(

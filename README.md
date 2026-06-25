@@ -199,7 +199,8 @@ http-server
 | **Mover para trás** | S ou Seta ↓ |
 | **Mover para esquerda** | A ou Seta ← |
 | **Mover para direita** | D ou Seta → |
-| **Rotacionar câmera** | Mouse (mover) |
+| **Rotacionar câmera** | Mouse (Mover) |
+| **Interagir com objetos** | Mouse (Clique) |
 | **Evento supresa** | F |
 ***OBS*** | A tecla  F proporciona um evento surpresa quando acionada próxima a cama do quarto final! |
 

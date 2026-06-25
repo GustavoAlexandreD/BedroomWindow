@@ -141,7 +141,7 @@ export class EntityFactory {
                 texPath: "assets/textures/wood_table_diff_4k.jpg",
                 flipY: false,
                 scale: 35.0,
-                boxSize: [3.0, 20.0, 10.0]
+                boxSize: [8.0, 20.0, 8.0]
             },
             "mesa_jantar": {
                 nome:"Mesa de Jantar",
