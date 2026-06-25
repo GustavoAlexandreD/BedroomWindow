@@ -14,11 +14,7 @@ export class AudioManager {
             "musica-principal": "assets/audio/musica-principal.mp3",
             "som-silencio": "assets/audio/som-silencio.mp3",
             "fogo-tocha": "assets/audio/fogo-tocha.mp3",
-            "batida-janela": "assets/audio/batida-janela.mp3",
-            "som-chuva-janela": "assets/audio/som-chuva-janela.mp3",
             "som-gato": "assets/audio/som-gato.mp3",
-            "som-coruja": "assets/audio/som-coruja.mp3",
-            "vidro-quebrando": "assets/audio/vidro-quebrando.mp3",
             "som-monstro": "assets/audio/som-monstro.mp3",
             "som2-monstro": "assets/audio/som2-monstro.mp3"
         };
@@ -26,10 +22,7 @@ export class AudioManager {
         // Compatibilidade com nomes antigos usados em outras partes do projeto.
         this.alias = {
             bgm: "musica-principal",
-            knock: "batida-janela",
             monster: "som-monstro",
-            glassBreak: "vidro-quebrando",
-            rain: "som-chuva-janela",
             cat: "som-gato"
         };
 
@@ -59,7 +52,6 @@ export class AudioManager {
         // 🎵 BGM
         // =========================
         this.bgmSource = null;
-        this.rainSource = null;
 
         // =========================
         // 🧠 POOL (performance)
@@ -220,28 +212,6 @@ export class AudioManager {
         this.bgmGain.gain.value = v;
     }
 
-    playRainLoop(position = [0, 0, 0]) {
-        const key = this._resolveName("som-chuva-janela");
-        const buffer = this.buffers[key];
-        if (!buffer || this.rainSource) return;
-
-        const { source } = this._create3DSource(buffer, position, {
-            refDistance: 8,
-            maxDistance: 120,
-            rolloffFactor: 0.15
-        });
-        source.loop = true;
-        source.start(0);
-        this.rainSource = source;
-    }
-
-    stopRainLoop() {
-        if (!this.rainSource) return;
-        this.rainSource.stop();
-        this.rainSource.disconnect();
-        this.rainSource = null;
-    }
-
     // =========================
     // 🔊 CRIAR SOM 3D
     // =========================
@@ -327,15 +297,9 @@ export class AudioManager {
     }
 
     /**
-     * Ao spawnar entidade: sempre toca batida na janela.
+     * Ao spawnar entidade: toca um som característico da entidade
      */
     playEntitySpawn(entityType, position, options = {}) {
-        this.play3D("batida-janela", position, {
-            refDistance: 1.8,
-            maxDistance: 35,
-            ...options
-        });
-
         // Chance pequena de já tocar também o som característico ao spawn.
         if (Math.random() < 0.25) {
             this.playEntityCharacteristic(entityType, position);

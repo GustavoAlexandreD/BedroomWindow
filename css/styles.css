@@ -24,6 +24,16 @@
   background-repeat: no-repeat;
 }
 
+.bg-container2 {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: url('../assets/Images/bilhete.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 /* Overlay escuro */
 .overlay {
   position: absolute;

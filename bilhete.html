@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Bilhete</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- CSS global -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="h-screen w-screen overflow-hidden">
+  <audio id="bgMusic" loop>
+    <source src="assets/audio/musica-principal.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Background -->
+  <div class="bg-container2"></div>
+
+  <!-- Overlay -->
+  <div class="overlay"></div>
+
+  <!-- Conteúdo -->
+  <main class="relative z-10 flex items-center justify-center h-full px-6">
+
+    <a href="index.html" class="menu-btn absolute bottom-8">
+        VOLTAR AO MENU
+    </a>
+
+  </main>
+  <script>
+    const music = document.getElementById('bgMusic');
+  
+    function startMusic() {
+      if (music.paused) {
+        music.play()
+          .then(() => {
+            console.log("Música tocando!");
+          })
+          .catch(err => {
+            console.log("Erro ao tocar:", err);
+          });
+      }
+    }
+  
+    // Garante interação válida
+    document.addEventListener('click', startMusic);
+    document.addEventListener('keydown', startMusic);
+  </script>
+
+</body>
+</html>

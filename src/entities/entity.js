@@ -1,4 +1,4 @@
-import { irParaGameOver } from "../menu_e_gameover/gameover.js";
+import { irParaGameOver } from "../gameover/gameover.js";
 
 /**
  * Classe abstrata base das entidades do jogo.

@@ -23,27 +23,7 @@ export class Monster extends Object{
                 4000,
                 9000
             );
-        } else {
-            this._tocarSom3D("batida-janela", { refDistance: 2.5, maxDistance: 35, rolloffFactor: 1.4 });
         }
-        this.iniciarBarulhoTemporizado();
-        this.iniciarQuebraJanelaTemporizada();
     }
 
-    iniciarBarulhoTemporizado() {
-        if (this._noiseIntervalId) clearInterval(this._noiseIntervalId);
-        this._noiseIntervalId = setInterval(() => {
-            if (!this.isActive || this.isBroken) return;
-            this._fazerBarulhoNaJanelaExistente();
-            this._tocarSom3D("batida-janela", { refDistance: 2.5, maxDistance: 35, rolloffFactor: 1.4 });
-        }, this.noiseIntervalMs);
-    }
-
-    iniciarQuebraJanelaTemporizada() {
-        if (this._breakTimeoutId) clearTimeout(this._breakTimeoutId);
-        this._breakTimeoutId = setTimeout(() => {
-            if (!this.isActive || this.isBroken) return;
-            this._quebrarJanelaEFimDeJogo();
-        }, this.breakAfterMs);
-    }
 }
