@@ -36,7 +36,7 @@ const input = {
 
 // Luz dinâmica do jogador (Lampião)
 const dynamicLightColor = [1.0, 0.42, 0.1]; // Ajuste aqui para mudar a cor da luz
-const InitialplayerLightRadius = 5000.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
+const InitialplayerLightRadius = 90.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
 let playerLightRadius; // Variável que será animada ao longo do tempo
 
 // Função de inicialização (Carrega texturas, modelos, configura a cena, etc)
@@ -301,6 +301,21 @@ async function init() {
   papel_2.transform.ry = 180;
   const janela_bloqueio = await factory.createFurniture("janela_block", [roomInstance1.roomPosition[0]-58.0, roomInstance1.roomPosition[1]+7.0, roomInstance1.roomPosition[2]+23.0]);
   janela_bloqueio.transform.ry = 90;
+
+  //Objetos do Quarto 2
+  const mesa_jantar = await factory.createFurniture("mesa_jantar", [roomInstance7.roomPosition[0], roomInstance7.roomPosition[1]+25.0, roomInstance7.roomPosition[2]]);
+  mesa_jantar.transform.rx = 180;
+  mesa_jantar.transform.ry = 90;
+  const fogao = await factory.createFurniture("fogao", [roomInstance7.roomPosition[0]-56.0, roomInstance7.roomPosition[1]+12.0, roomInstance7.roomPosition[2]+45.0]);
+  fogao.transform.rx = 180;
+  fogao.transform.ry = 270;
+  const pista_2 = await factory.createFurniture("papeis", [roomInstance7.roomPosition[0], roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]]);
+  const papel_3 = await factory.createFurniture("papeis", [roomInstance7.roomPosition[0]-35.0, roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]-35.0]);
+  papel.transform.ry = 180;
+  const papel_4 = await factory.createFurniture("papeis_1", [roomInstance7.roomPosition[0]+35.0, roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]+25.0]);
+  papel_1.transform.ry = 180;
+  const papel_5 = await factory.createFurniture("papeis_2", [roomInstance7.roomPosition[0]-40.0, roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]+52.0]);
+  papel_2.transform.ry = 180;
 
   window.dispatchEvent(new Event("gameLoaded"));
   
@@ -569,15 +584,19 @@ function draw(time = 0) {
       obj.transform.scale,
       obj.transform.scale
     );
-    const matR = Math3D.rotateY(obj.transform.ry || 0);
+    const matRX = Math3D.rotateX(obj.transform.rx || 0);
+    const matRY = Math3D.rotateY(obj.transform.ry || 0);
+    const matRZ = Math3D.rotateZ ? Math3D.rotateZ(obj.transform.rz || 0) : Math3D.rotateY(0);
     const matT = Math3D.translationMatrix(
       obj.transform.x,
       obj.transform.y,
       obj.transform.z
     );
 
-    // Primeiro junta a Rotação com a Escala
-    const matRS = Math3D.multiply(matR, matS);
+    // Combina escala e rotação em ordem X -> Y -> Z
+    let matRS = Math3D.multiply(matRX, matS);
+    matRS = Math3D.multiply(matRY, matRS);
+    matRS = Math3D.multiply(matRZ, matRS);
 
     // Depois junta a Translação com o resultado anterior (Ordem T * R * S)
     const model = Math3D.multiply(matT, matRS);

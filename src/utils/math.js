@@ -8,11 +8,25 @@ export function scaleMatrix(sx, sy, sz) {
     return [sx, 0, 0, 0, 0, sy, 0, 0, 0, 0, sz, 0, 0, 0, 0, 1];
 }
 
+export function rotateX(angle) {
+    var rad = angle * Math.PI / 180.0;
+    var c = Math.cos(rad);
+    var s = Math.sin(rad);
+    return [1, 0, 0, 0, 0, c, -s, 0, 0, s, c, 0, 0, 0, 0, 1];
+}
+
 export function rotateY(angle) {
     var rad = angle * Math.PI / 180.0;
     var c = Math.cos(rad);
     var s = Math.sin(rad);
     return [c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1];
+}
+
+export function rotateZ(angle) {
+    var rad = angle * Math.PI / 180.0;
+    var c = Math.cos(rad);
+    var s = Math.sin(rad);
+    return [c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 }
 
 export function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }

@@ -22,7 +22,7 @@ export class EntityFactory {
                 objPath: "assets/models/mesa_cabeceira.obj",
                 texPath: "assets/textures/wood_table_diff_4k.jpg",
                 scale: 20.0,
-                boxSize: [15.0, 20.0, 15.0]
+                boxSize: [15.0, 20.0, 10.0]
             },
             "cama": {
                 name: "Cama",
@@ -134,11 +134,24 @@ export class EntityFactory {
                 scale: 35.0,
                 boxSize: [3.0, 20.0, 10.0]
             },
+            "mesa_jantar": {
+                nome:"Mesa de Jantar",
+                objPath: "assets/models/mesa_jantar.obj",
+                texPath: "assets/textures/mesa_jantar.jpg",
+                scale: 50.0,
+                boxSize: [3.0, 20.0, 10.0]
+            },
+            "fogao": {
+                nome:"Fogao",
+                objPath: "assets/models/CastIronStove_pieces.obj",
+                texPath: "assets/textures/CastIronStoveTex.png",
+                scale: 40.0,
+                boxSize: [3.0, 20.0, 10.0]
+            },
             "porta": {
                 name:"Porta",
                 objPath: "assets/models/door.obj",
                 color: [1.0, 1.0, 0.8, 1.0],
-                flipY: false,
                 scale: 35.0,
                 boxSize: [5.0, 20.0, 5.0]
             }
