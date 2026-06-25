@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Game Over - Bedroom Window</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- CSS custom (mesmo do index) -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="h-screen w-screen overflow-hidden">
+
+  <!-- 🎵 MESMA MÚSICA -->
+  <audio id="bgMusic" loop>
+    <source src="assets/audio/musica-principal.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Background (igual index) -->
+  <div class="bg-container"></div>
+
+  <!-- Overlay -->
+  <div class="overlay"></div>
+
+  <!-- Conteúdo -->
+  <main class="relative z-10 flex flex-col items-center justify-center h-full text-center">
+
+    <!-- 💀 GAME OVER -->
+    <h1 class="title mb-6 text-red-600">
+      GAME OVER
+    </h1>
+
+    <!-- Subtexto opcional -->
+    <p class="text-gray-300 mb-12 text-sm tracking-widest">
+      VOCÊ NÃO FOI CAPAZ DE ESCAPAR DAQUELES QUARTOS SEM FIM!<br>
+      PARECE QUE ALGO SINISTRO O ENCONTROU... TALVEZ SEJA MELHOR TENTAR NOVAMENTE?
+    </p>
+
+    <!-- Botões -->
+    <div class="flex flex-col gap-6 w-64">
+
+      <!-- 🔁 Jogar novamente -->
+      <a href="main.html" class="menu-btn">
+        JOGAR NOVAMENTE
+      </a>
+
+      <!-- 🔙 Voltar ao menu -->
+      <a href="index.html" class="menu-btn">
+        VOLTAR AO MENU
+      </a>
+
+    </div>
+
+  </main>
+
+  <!-- =========================
+       🎧 AUTOPLAY CONTROL
+  ========================== -->
+  <script>
+    const music = document.getElementById('bgMusic');
+
+    function startMusic() {
+      if (music.paused) {
+        music.play()
+          .then(() => {
+            console.log("Música tocando!");
+          })
+          .catch(err => {
+            console.log("Erro ao tocar:", err);
+          });
+      }
+    }
+
+    document.addEventListener('click', startMusic);
+    document.addEventListener('keydown', startMusic);
+  </script>
+
+</body>
+</html>

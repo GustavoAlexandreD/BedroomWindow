@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bedroom Window - Jogo</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
+    #glcanvas1 { width: 100vw; height: 100vh; display: block; }
+  </style>
+</head>
+<body>
+  <canvas id="glcanvas1" width="1280" height="720"></canvas>
+
+  <script id="vertex-shader" type="x-shader/x-vertex">
+    attribute vec3 position;
+    attribute vec3 normal;
+    attribute vec2 texCoord;
+
+    uniform mat4 projection;
+    uniform mat4 view;
+    uniform mat4 transf;
+
+    varying vec3 v_normal;
+    varying vec3 v_fragPosition;
+    varying vec2 v_texCoord;
+
+    void main() {
+      vec4 worldPosition = transf * vec4(position, 1.0);
+      gl_Position = projection * view * worldPosition;
+      v_fragPosition = worldPosition.xyz;
+      v_normal = normalize((transf * vec4(normal, 0.0)).xyz);
+      v_texCoord = texCoord;
+    }
+  </script>
+
+  <script id="frag-shader" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec3 v_normal;
+    varying vec3 v_fragPosition;
+    varying vec2 v_texCoord;
+
+    uniform vec3 u_lightPosStatic;
+    uniform vec3 u_lightPosDynamic;
+    uniform float u_lightRadius;
+    uniform vec3 u_lightColorDynamic;
+    uniform vec3 u_viewPosition;
+    uniform int u_useTexture;
+    uniform vec4 u_color;
+    uniform sampler2D tex;
+
+    void main() {
+      vec3 normal = normalize(v_normal);
+
+      // Apenas luz dinâmica (jogador) com raio limitado; ambiente é preto
+      vec3 lightDir = normalize(u_lightPosDynamic - v_fragPosition);
+      float diff = max(dot(normal, lightDir), 0.0);
+      float dist = length(u_lightPosDynamic - v_fragPosition);
+      float att = clamp(1.0 - dist / u_lightRadius, 0.0, 1.0);
+
+      // Luz final: difusa * cor * atenuação
+      vec3 diffuse = diff * u_lightColorDynamic * att;
+
+      vec4 baseColor = u_useTexture == 1 ? texture2D(tex, v_texCoord) : u_color;
+      // Multiplica pelo difuso; sem iluminação ambiente adicional
+      gl_FragColor = vec4(baseColor.rgb * diffuse, baseColor.a);
+    }
+  </script>
+
+  <script type="module" src="src/main.js"></script>
+
+  <canvas id="timer" width="300" height="300"></canvas>
+
+  <style>
+  #timer {
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      width: 150px;
+      height: 150px;
+      pointer-events: none;
+  }
+  </style>
+
+  <script>
+    const canvas = document.getElementById("timer");
+    const ctx = canvas.getContext("2d");
+
+    const duration = 167; // segundos
+    const startTime = Date.now();
+
+    function draw() {
+        const elapsed = (Date.now() - startTime) / 1000;
+        const progress = Math.min(elapsed / duration, 1);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Círculo de fundo
+        ctx.beginPath();
+        ctx.arc(150, 150, 100, 0, Math.PI * 2);
+        ctx.strokeStyle = "#ccc";
+        ctx.lineWidth = 10;
+        ctx.stroke();
+
+        // Progresso
+        ctx.beginPath();
+        ctx.arc(
+            150,
+            150,
+            100,
+            -Math.PI / 2,
+            -Math.PI / 2 + progress * Math.PI * 2
+        );
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 10;
+        ctx.stroke();
+
+        // Tempo restante
+        const remaining = Math.ceil(duration - elapsed);
+
+        ctx.fillStyle = "red";
+        ctx.font = "40px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(Math.max(remaining, 0), 150, 150);
+
+        if (progress < 1) {
+            requestAnimationFrame(draw);
+        } else {
+            console.log("Tempo esgotado!");
+        }
+    }
+
+    window.addEventListener("gameLoaded", () => {
+      draw();
+    });
+  </script>
+</body>
+</html>

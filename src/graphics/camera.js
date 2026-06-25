@@ -1,51 +1,130 @@
-import * as mat4 from '../math/mat4.js';
+import { normalize, cross, lookat } from "../utils/math.js";
 
-export class Camera {
-    constructor(canvas) {
-        this.canvas = canvas;
+export function createCamera() {
+  return {
+    position: [0, 5, 0], 
+    yaw: 0,               
+    pitch: 0,             
+    speed: 20.0,
+    sensitivity: 0.003
+  };
+}
 
-        // Estado (Apenas dados de posicionamento e orientação)
-        this.position = new Float32Array([0, 0, 0]);
-        this.front = new Float32Array([0, 0, -1]);
-        this.up = new Float32Array([0, 1, 0]);
+function getForward(camera) {
+  return normalize([
+    Math.sin(camera.yaw) * Math.cos(camera.pitch),
+    Math.sin(camera.pitch),
+   -Math.cos(camera.yaw) * Math.cos(camera.pitch)
+  ]);
+}
 
-        // Ângulos (Recebidos do Player)
-        this.yaw = -90;
-        this.pitch = 0;
+function getRight(camera) {
+  return normalize(
+    cross(getForward(camera), [0, 1, 0])
+  );
+}
+
+export function updateCameraMovement(camera, input, deltaTime, collisionSystem, windowsPosition) {
+  const velocity = camera.speed * deltaTime;
+
+  const moveForward = [Math.sin(camera.yaw), 0, -Math.cos(camera.yaw)];
+  const moveRight = [Math.cos(camera.yaw), 0, Math.sin(camera.yaw)];
+
+  // 1. Criamos uma cópia da posição atual para calcular o próximo passo
+  let nextPos = [...camera.position];
+
+  if (input.forward) {
+    nextPos[0] += moveForward[0] * velocity;
+    nextPos[2] += moveForward[2] * velocity;
+  }
+  if (input.backward) {
+    nextPos[0] -= moveForward[0] * velocity;
+    nextPos[2] -= moveForward[2] * velocity;
+  }
+  if (input.left) {
+    nextPos[0] -= moveRight[0] * velocity;
+    nextPos[2] -= moveRight[2] * velocity;
+  }
+  if (input.right) {
+    nextPos[0] += moveRight[0] * velocity;
+    nextPos[2] += moveRight[2] * velocity;
+  }
+
+  // Se o sistema de colisão existir, ele filtra o nosso passo!
+  if (collisionSystem) {
+      // O tamanho físico do jogador (Largura X, Altura Y, Profundidade Z)
+      const playerSize = [14.0, 15.0, 14.0]; 
+      
+      // A função moveWithCollision impede a câmara de atravessar a mesa
+      // deslizando-a pela parede (anti-tunneling)
+      nextPos = collisionSystem.moveWithCollision(camera.position, nextPos, playerSize);
+  }
+
+  let passingWindow = false;
+  if (windowsPosition) {
+    for (const windowPos of windowsPosition) {
+      const [start, end] = windowPos;
+      const minX = Math.min(start[0], end[0]);
+      const maxX = Math.max(start[0], end[0]);
+      const minZ = Math.min(start[2], end[2]);
+      const maxZ = Math.max(start[2], end[2]);
+      const tolerance = 3.0;
+
+      const insideX = nextPos[0] >= minX - tolerance && nextPos[0] <= maxX + tolerance;
+      const insideZ = nextPos[2] >= minZ - tolerance && nextPos[2] <= maxZ + tolerance;
+
+      if (insideX && insideZ) {
+        passingWindow = true;
+        break;
+      }else{
+        passingWindow = false;
+      }
     }
+  }
 
-    /**
-     * Atualiza os vetores de direção baseados nos ângulos atuais.
-     * Chamado pelo Game.js após atualizar o Player.
-     */
-    _updateVectors() {
-        const radYaw = (this.yaw * Math.PI) / 180;
-        const radPitch = (this.pitch * Math.PI) / 180;
+  if (passingWindow) {
+    nextPos[1] = 12; // aumenta um pouco para passar pela janela
+  } else {
+    nextPos[1] = 5; // mantém a altura normal
+  }
 
-        const x = Math.cos(radYaw) * Math.cos(radPitch);
-        const y = Math.sin(radPitch);
-        const z = Math.sin(radYaw) * Math.cos(radPitch);
+    // FOV permanece constante; nenhuma interpolação aqui
 
-        // Atualiza o vetor frontal (para onde a câmera olha)
-        this.front = this._normalize([x, y, z]);
-    }
+  const margin = 5.0; // margem para evitar que a câmera fique muito próxima da parede
+  const startLimit = 60.0 - margin;
+  const endLimit = -435.0 + margin;
 
-    /**
-     * Gera a Matriz de Visualização (View Matrix) para o Shader
-     */
-    getViewMatrix() {
-        // target = posição + direção para onde olha
-        const target = this._add(this.position, this.front);
-        return mat4.createCamera(this.position, target, this.up);
-    }
+  if (nextPos[0] > startLimit) nextPos[0] = startLimit;
+  if (nextPos[0] < endLimit) nextPos[0] = endLimit;
 
-    // --- Utilitários Matemáticos Essenciais ---
-    _normalize(v) {
-        const len = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-        return len === 0 ? [0, 0, 0] : [v[0] / len, v[1] / len, v[2] / len];
-    }
+  if (nextPos[2] > startLimit) nextPos[2] = startLimit;
+  if (nextPos[2] < endLimit) nextPos[2] = endLimit;
 
-    _add(a, b) {
-        return [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
-    }
+  camera.position[0] = nextPos[0];
+  camera.position[1] = nextPos[1];
+  camera.position[2] = nextPos[2];
+}
+
+export function updateCameraLook(camera, dx, dy) {
+  camera.yaw   += dx * camera.sensitivity;
+  camera.pitch -= dy * camera.sensitivity;
+
+  // evita virar a cabeça 360° pra cima
+  const limit = Math.PI / 2 - 0.01;
+  camera.pitch = Math.max(-limit, Math.min(limit, camera.pitch));
+}
+
+export function getViewMatrix(camera, eyePosition = camera.position) {
+  const forward = getForward(camera);
+  const target = [
+    eyePosition[0] + forward[0],
+    eyePosition[1] + forward[1],
+    eyePosition[2] + forward[2]
+  ];
+
+  return lookat(
+    eyePosition,
+    target,
+    [0, 1, 0]
+  );
 }

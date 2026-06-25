@@ -1,13 +1,14 @@
-class EntityManager {
+export class EntityManager {
   constructor() {
-    this.windows = [];
+    this.entities = [];
   }
 
+  // Roda a cada frame calculando física, IA, colisões e temporizadores.
   update(dt) {
-    this.windows.forEach(w => w.update(dt));
-  }
-
-  draw(renderer) {
-    this.windows.forEach(w => renderer.draw(w));
+    this.entities.forEach(e => {
+        if (e.update) {
+            e.update(dt);
+        }
+    });
   }
 }
