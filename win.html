@@ -2,67 +2,65 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Bedroom Window</title>
+  <title>Game Over - Bedroom Window</title>
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- CSS custom -->
+  <!-- CSS custom (mesmo do index) -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body class="h-screen w-screen overflow-hidden">
+
+  <!-- 🎵 MESMA MÚSICA -->
   <audio id="bgMusic" loop>
     <source src="assets/audio/musica-principal.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Background -->
+  <!-- Background (igual index) -->
   <div class="bg-container"></div>
 
-  <!-- Overlay (escurecimento) -->
+  <!-- Overlay -->
   <div class="overlay"></div>
 
   <!-- Conteúdo -->
   <main class="relative z-10 flex flex-col items-center justify-center h-full text-center">
 
-    <!-- Título -->
-    <h1 class="title mb-12">
-      BEDROOM WINDOW
+    <!-- 💀 GAME OVER -->
+    <h1 class="title mb-6 text-red-600">
+      WIN!!
     </h1>
+
+    <!-- Subtexto opcional -->
+    <p class="text-gray-300 mb-12 text-sm tracking-widest">
+        VOCÊ ENCONTROU JANELAS QUE LHE PERMITEM ESCAPAR DOS QUARTOS SEM FIM!<br>
+        PARABÉNS POR CONSEGUIR CHEGAR ATÉ AQUI! AGORA VOCÊ PODE RESPIRAR UM AR FRESCO E APROVEITAR A VISTA!
+    </p>
 
     <!-- Botões -->
     <div class="flex flex-col gap-6 w-64">
 
-      <!-- <a href="game.html" class="menu-btn">
-        INICIAR
-      </a> -->
+      <!-- 🔁 Jogar novamente -->
       <a href="main.html" class="menu-btn">
-        INICIAR
+        JOGAR NOVAMENTE
       </a>
 
-      <a href="tutorial.html" class="menu-btn">
-        TUTORIAL
+      <!-- 🔙 Voltar ao menu -->
+      <a href="index.html" class="menu-btn">
+        VOLTAR AO MENU
       </a>
-
-      <a href="historia.html" class="menu-btn">
-        HISTÓRIA
-      </a>
-
-      <button onclick="exitGame()" class="menu-btn">
-        SAIR
-      </button>
 
     </div>
+
   </main>
 
-  <script>
-    function exitGame() {
-      alert("Função de sair (em jogos reais fecha aplicação ou volta ao launcher)");
-    }
-  </script>
+  <!-- =========================
+       🎧 AUTOPLAY CONTROL
+  ========================== -->
   <script>
     const music = document.getElementById('bgMusic');
-  
+
     function startMusic() {
       if (music.paused) {
         music.play()
@@ -74,8 +72,7 @@
           });
       }
     }
-  
-    // Garante interação válida
+
     document.addEventListener('click', startMusic);
     document.addEventListener('keydown', startMusic);
   </script>
