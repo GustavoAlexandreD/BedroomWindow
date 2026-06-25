@@ -126,6 +126,14 @@ export class EntityFactory {
                 scale: 30.0,
                 boxSize: [25.0, 20.0, 10.0]
             },
+            "cadeira": {
+                nome:"Cadeira",
+                objPath: "assets/models/cadeira.obj",
+                texPath: "assets/textures/wood_table_diff_4k.jpg",
+                flipY: false,
+                scale: 15.0,
+                boxSize: [2.5, 20.0, 2.5]
+            },
             "janela_block": {
                 nome:"Madeira na janela",
                 objPath: "assets/models/windows_block.obj",
@@ -239,7 +247,7 @@ export class EntityFactory {
         this.sceneObjects.push(drawData);
         
         if (this.collisionSystem && entity.boxSize) {
-            this.collisionSystem.addBox(entity.position, entity.boxSize);
+            this.collisionSystem.addBox(entity.position, entity.boxSize, entity);
         }
 
         return entity;

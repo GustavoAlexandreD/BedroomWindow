@@ -4,10 +4,11 @@ export class CollisionSystem {
         this.EPS = 0.001;
     }
 
-    addBox(position, size) {
+    addBox(position, size, entity = null) {
         this.colliders.push({
             position: [...position],
             size: [...size],
+            entity: entity || null
         });
     }
 
@@ -53,9 +54,59 @@ export class CollisionSystem {
         );
     }
 
+    _getColliderPosition(collider) {
+        if (collider.entity && collider.entity.transform) {
+            return [
+                collider.entity.transform.x,
+                collider.entity.transform.y,
+                collider.entity.transform.z
+            ];
+        }
+        return collider.position;
+    }
+
+    _getColliderSize(collider) {
+        if (!collider.entity || !collider.entity.transform) {
+            return collider.size;
+        }
+
+        const rx = collider.entity.transform.rx || 0;
+        const ry = collider.entity.transform.ry || 0;
+        const rz = collider.entity.transform.rz || 0;
+        const hw = [collider.size[0] / 2, collider.size[1] / 2, collider.size[2] / 2];
+
+        const degToRad = Math.PI / 180.0;
+        const cx = Math.cos(rx * degToRad);
+        const sx = Math.sin(rx * degToRad);
+        const cy = Math.cos(ry * degToRad);
+        const sy = Math.sin(ry * degToRad);
+        const cz = Math.cos(rz * degToRad);
+        const sz = Math.sin(rz * degToRad);
+
+        const r00 = cz * cy;
+        const r01 = cz * sy * sx - sz * cx;
+        const r02 = cz * sy * cx + sz * sx;
+
+        const r10 = sz * cy;
+        const r11 = sz * sy * sx + cz * cx;
+        const r12 = sz * sy * cx - cz * sx;
+
+        const r20 = -sy;
+        const r21 = cy * sx;
+        const r22 = cy * cx;
+
+        return [
+            Math.abs(r00) * hw[0] + Math.abs(r01) * hw[1] + Math.abs(r02) * hw[2],
+            Math.abs(r10) * hw[0] + Math.abs(r11) * hw[1] + Math.abs(r12) * hw[2],
+            Math.abs(r20) * hw[0] + Math.abs(r21) * hw[1] + Math.abs(r22) * hw[2]
+        ].map(v => v * 2);
+    }
+
     _hasCollision(position, size) {
         for (const collider of this.colliders) {
-            if (this.checkAABB(position, size, collider.position, collider.size)) {
+            const colliderPosition = this._getColliderPosition(collider);
+            const colliderSize = this._getColliderSize(collider);
+            if (this.checkAABB(position, size, colliderPosition, colliderSize)) {
                 return true;
             }
         }

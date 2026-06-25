@@ -264,26 +264,14 @@ async function init() {
   await factory.preloadAll();
 
   // 3. Spawna os objetos pelo mapa de forma instantânea (porque já estão no cache)
-  const mesa_cabeceira = await factory.createFurniture("mesa_cabeceira", [roomInstance15.roomPosition[0]+10.0, roomInstance15.roomPosition[1]-10.0, roomInstance15.roomPosition[2]+52.0]);
-  mesa_cabeceira.transform.ry = 180;
-  const camaGotica = await factory.createFurniture("cama", [roomInstance15.roomPosition[0]+50.0, roomInstance15.roomPosition[1]-5.0, roomInstance15.roomPosition[2]+42.0]);
-  camaGotica.transform.ry = 180;
-  const gato = await factory.createFurniture("gato", [roomInstance15.roomPosition[0]+50.0, roomInstance15.roomPosition[1]-13.0, roomInstance15.roomPosition[2]+42.0]);
-  gato.transform.ry = 180;
-  const relogio = await factory.createFurniture("relogio", [roomInstance15.roomPosition[0]-20.0, roomInstance15.roomPosition[1]+0.0, roomInstance15.roomPosition[2]+52.0]);
-  relogio.transform.ry = 180;
-  const quadro = await factory.createFurniture("quadro", [roomInstance15.roomPosition[0]+10.0, roomInstance15.roomPosition[1]+5.0, roomInstance15.roomPosition[2]+59.0]);
-  quadro.transform.ry = 180;
-  const lamparina = await factory.createFurniture("lamparina", [0.0, 0.0, 0.0]);
-  const porta = await factory.createFurniture("porta", [roomInstance2.roomPosition[0], roomInstance2.roomPosition[1], roomInstance2.roomPosition[2]-62.5]);
 
   //Objetos do Quarto 1
   const sofa = await factory.createFurniture("sofa", [roomInstance1.roomPosition[0], roomInstance1.roomPosition[1]-5.0, roomInstance1.roomPosition[2]+52.0]);
   sofa.transform.ry = 90;
   const armario1 = await factory.createFurniture("armario", [roomInstance1.roomPosition[0]-20.0, roomInstance1.roomPosition[1]-0.0, roomInstance1.roomPosition[2]-52.0]);
-  armario1.transform.ry = 45;
+  // armario1.transform.ry = 45;
   const armario2 = await factory.createFurniture("armario", [roomInstance1.roomPosition[0]+10.0, roomInstance1.roomPosition[1]-0.0, roomInstance1.roomPosition[2]-52.0]);
-  armario2.transform.ry = 45;
+  // armario2.transform.ry = 45;
   const livros = await factory.createFurniture("livros", [roomInstance1.roomPosition[0]+40.0, roomInstance1.roomPosition[1]-12.0, roomInstance1.roomPosition[2]-45.0]);
   const livros_1 = await factory.createFurniture("livros_1", [roomInstance1.roomPosition[0]+13.0, roomInstance1.roomPosition[1]-8.0, roomInstance1.roomPosition[2]-50.0]);
   const livros_2 = await factory.createFurniture("livros_1", [roomInstance1.roomPosition[0]-23.0, roomInstance1.roomPosition[1]-8.0, roomInstance1.roomPosition[2]-50.0]);
@@ -311,11 +299,47 @@ async function init() {
   fogao.transform.ry = 270;
   const pista_2 = await factory.createFurniture("papeis", [roomInstance7.roomPosition[0], roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]]);
   const papel_3 = await factory.createFurniture("papeis", [roomInstance7.roomPosition[0]-35.0, roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]-35.0]);
-  papel.transform.ry = 180;
+  papel_3.transform.ry = 180;
   const papel_4 = await factory.createFurniture("papeis_1", [roomInstance7.roomPosition[0]+35.0, roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]+25.0]);
-  papel_1.transform.ry = 180;
+  papel_4.transform.ry = 180;
   const papel_5 = await factory.createFurniture("papeis_2", [roomInstance7.roomPosition[0]-40.0, roomInstance7.roomPosition[1]-14.5, roomInstance7.roomPosition[2]+52.0]);
-  papel_2.transform.ry = 180;
+  papel_5.transform.ry = 180;
+  
+  //Objetos do Quarto 3
+  const mesa_escritorio = await factory.createFurniture("mesa", [roomInstance9.roomPosition[0]-40.0, roomInstance9.roomPosition[1]-10.0, roomInstance9.roomPosition[2]-45.0]);
+  mesa_escritorio.transform.rx = 180;
+  mesa_escritorio.transform.ry = 34;
+  const armario3 = await factory.createFurniture("armario", [roomInstance9.roomPosition[0]+52.0, roomInstance9.roomPosition[1]-0.0, roomInstance9.roomPosition[2]+25.0]);
+  armario3.transform.ry = 270;
+  const armario4 = await factory.createFurniture("armario", [roomInstance9.roomPosition[0]+35.0, roomInstance9.roomPosition[1]-10.0, roomInstance9.roomPosition[2]-35.0]);
+  armario4.transform.rx = 90;
+  armario4.transform.ry = 45;
+  const pista_3 = await factory.createFurniture("papeis", [roomInstance9.roomPosition[0], roomInstance9.roomPosition[1]-14.5, roomInstance9.roomPosition[2]]);
+  const papel_6 = await factory.createFurniture("papeis", [roomInstance9.roomPosition[0]-35.0, roomInstance9.roomPosition[1]-14.5, roomInstance9.roomPosition[2]+35.0]);
+  papel_6.transform.ry = 180;
+  const papel_7 = await factory.createFurniture("papeis_1", [roomInstance9.roomPosition[0]+35.0, roomInstance9.roomPosition[1]-14.5, roomInstance9.roomPosition[2]+25.0]);
+  papel_7.transform.ry = 180;
+  const papel_8 = await factory.createFurniture("papeis_2", [roomInstance9.roomPosition[0]-40.0, roomInstance9.roomPosition[1]-14.5, roomInstance9.roomPosition[2]+52.0]);
+  papel_8.transform.ry = 180;
+  const papel_9 = await factory.createFurniture("papeis_2", [roomInstance9.roomPosition[0]-40.0, roomInstance9.roomPosition[1]-14.5, roomInstance9.roomPosition[2]-25.0]);
+  papel_9.transform.ry = 180;
+  const livros_6 = await factory.createFurniture("livros", [roomInstance9.roomPosition[0]-40.0, roomInstance9.roomPosition[1]-12.0, roomInstance9.roomPosition[2]+45.0]);
+  const cadeira = await factory.createFurniture("cadeira", [roomInstance9.roomPosition[0]-40.0, roomInstance9.roomPosition[1]-8.0, roomInstance9.roomPosition[2]-5.0]);
+  cadeira.transform.ry = 295;
+
+  //Objetos do Quarto 4
+  const mesa_cabeceira = await factory.createFurniture("mesa_cabeceira", [roomInstance15.roomPosition[0]+10.0, roomInstance15.roomPosition[1]-10.0, roomInstance15.roomPosition[2]+52.0]);
+  mesa_cabeceira.transform.ry = 180;
+  const camaGotica = await factory.createFurniture("cama", [roomInstance15.roomPosition[0]+50.0, roomInstance15.roomPosition[1]-5.0, roomInstance15.roomPosition[2]+42.0]);
+  camaGotica.transform.ry = 180;
+  const gato = await factory.createFurniture("gato", [roomInstance15.roomPosition[0]+50.0, roomInstance15.roomPosition[1]-13.0, roomInstance15.roomPosition[2]+42.0]);
+  gato.transform.ry = 180;
+  const relogio = await factory.createFurniture("relogio", [roomInstance15.roomPosition[0]-20.0, roomInstance15.roomPosition[1]+0.0, roomInstance15.roomPosition[2]+52.0]);
+  relogio.transform.ry = 180;
+  const quadro = await factory.createFurniture("quadro", [roomInstance15.roomPosition[0]+10.0, roomInstance15.roomPosition[1]+5.0, roomInstance15.roomPosition[2]+59.0]);
+  quadro.transform.ry = 180;
+  const lamparina = await factory.createFurniture("lamparina", [0.0, 0.0, 0.0]);
+  const porta = await factory.createFurniture("porta", [roomInstance2.roomPosition[0], roomInstance2.roomPosition[1], roomInstance2.roomPosition[2]-62.5]);
 
   window.dispatchEvent(new Event("gameLoaded"));
   
