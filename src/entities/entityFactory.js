@@ -64,6 +64,76 @@ export class EntityFactory {
                 boxSize: null,
                 isLightSource: true
             },
+            "sofa": {
+                nome:"Sofa",
+                objPath: "assets/models/couch.obj",
+                texPath: "assets/textures/couch_fabric.jpg",
+                flipY: false,
+                scale: 40.0,
+                boxSize: [40.0, 20.0, 10.0]
+            },
+            "armario": {
+                nome:"Armario",
+                objPath: "assets/models/armario.obj",
+                texPath: "assets/textures/wood_table_diff_4k.jpg",
+                flipY: false,
+                scale: 40.0,
+                boxSize: [25.0, 20.0, 10.0]
+            },
+            "livros": {
+                nome:"Livros",
+                objPath: "assets/models/books.obj",
+                color: [0.5, 0.5, 0.5, 1.0],
+                scale: 25.0,
+                boxSize: null
+            },
+            "livros_1": {
+                nome:"Livros_1",
+                objPath: "assets/models/books_1.obj",
+                color: [0.1, 0.4, 0.9, 1.0],
+                scale: 20.0,
+                boxSize: null
+            },
+            "papeis": {
+                nome:"Papeis",
+                objPath: "assets/models/paper_debris_1_002.obj",
+                texPath: "assets/textures/paper_debris_1_001_d.png",
+                flipY: false,
+                scale: 12.0,
+                boxSize: null
+            },
+            "papeis_1": {
+                nome:"Papeis",
+                objPath: "assets/models/paper_debris_1_003.obj",
+                texPath: "assets/textures/paper_debris_1_001_d.png",
+                flipY: false,
+                scale: 12.0,
+                boxSize: null
+            },
+            "papeis_2": {
+                nome:"Papeis",
+                objPath: "assets/models/paper_debris_1_001.obj",
+                texPath: "assets/textures/paper_debris_1_001_d.png",
+                flipY: false,
+                scale: 12.0,
+                boxSize: null
+            },
+            "mesa": {
+                nome:"mesa",
+                objPath: "assets/models/mesa.obj",
+                texPath: "assets/textures/wood_table_diff_4k.jpg",
+                flipY: false,
+                scale: 30.0,
+                boxSize: [25.0, 20.0, 10.0]
+            },
+            "janela_block": {
+                nome:"Madeira na janela",
+                objPath: "assets/models/windows_block.obj",
+                texPath: "assets/textures/wood_table_diff_4k.jpg",
+                flipY: false,
+                scale: 35.0,
+                boxSize: [3.0, 20.0, 10.0]
+            },
             "porta": {
                 name:"Porta",
                 objPath: "assets/models/door.obj",

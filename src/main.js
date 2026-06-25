@@ -36,7 +36,7 @@ const input = {
 
 // Luz dinâmica do jogador (Lampião)
 const dynamicLightColor = [1.0, 0.42, 0.1]; // Ajuste aqui para mudar a cor da luz
-const InitialplayerLightRadius = 90.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
+const InitialplayerLightRadius = 5000.0; // Raio da luz ao redor do jogador (ajuste conforme necessário)
 let playerLightRadius; // Variável que será animada ao longo do tempo
 
 // Função de inicialização (Carrega texturas, modelos, configura a cena, etc)
@@ -276,6 +276,32 @@ async function init() {
   quadro.transform.ry = 180;
   const lamparina = await factory.createFurniture("lamparina", [0.0, 0.0, 0.0]);
   const porta = await factory.createFurniture("porta", [roomInstance2.roomPosition[0], roomInstance2.roomPosition[1], roomInstance2.roomPosition[2]-62.5]);
+
+  //Objetos do Quarto 1
+  const sofa = await factory.createFurniture("sofa", [roomInstance1.roomPosition[0], roomInstance1.roomPosition[1]-5.0, roomInstance1.roomPosition[2]+52.0]);
+  sofa.transform.ry = 90;
+  const armario1 = await factory.createFurniture("armario", [roomInstance1.roomPosition[0]-20.0, roomInstance1.roomPosition[1]-0.0, roomInstance1.roomPosition[2]-52.0]);
+  armario1.transform.ry = 45;
+  const armario2 = await factory.createFurniture("armario", [roomInstance1.roomPosition[0]+10.0, roomInstance1.roomPosition[1]-0.0, roomInstance1.roomPosition[2]-52.0]);
+  armario2.transform.ry = 45;
+  const livros = await factory.createFurniture("livros", [roomInstance1.roomPosition[0]+40.0, roomInstance1.roomPosition[1]-12.0, roomInstance1.roomPosition[2]-45.0]);
+  const livros_1 = await factory.createFurniture("livros_1", [roomInstance1.roomPosition[0]+13.0, roomInstance1.roomPosition[1]-8.0, roomInstance1.roomPosition[2]-50.0]);
+  const livros_2 = await factory.createFurniture("livros_1", [roomInstance1.roomPosition[0]-23.0, roomInstance1.roomPosition[1]-8.0, roomInstance1.roomPosition[2]-50.0]);
+  const livros_3 = await factory.createFurniture("livros_1", [roomInstance1.roomPosition[0]-18.0, roomInstance1.roomPosition[1]+2.5, roomInstance1.roomPosition[2]-50.0]);
+  const livros_4 = await factory.createFurniture("livros_1", [roomInstance1.roomPosition[0]+7.0, roomInstance1.roomPosition[1]+12.0, roomInstance1.roomPosition[2]-50.0]);
+  const livros_5 = await factory.createFurniture("livros", [roomInstance1.roomPosition[0]+40.0, roomInstance1.roomPosition[1]-12.0, roomInstance1.roomPosition[2]+45.0]);
+  livros_5.transform.ry = 180;
+  const pista_1 = await factory.createFurniture("papeis", [roomInstance1.roomPosition[0]-45.0, roomInstance1.roomPosition[1]-14.5, roomInstance1.roomPosition[2]-25.0]);
+  const mesa = await factory.createFurniture("mesa", [roomInstance1.roomPosition[0]-40.0, roomInstance1.roomPosition[1]-10.0, roomInstance1.roomPosition[2]+52.0]);
+  const papel = await factory.createFurniture("papeis", [roomInstance1.roomPosition[0]-35.0, roomInstance1.roomPosition[1]-14.5, roomInstance1.roomPosition[2]+35.0]);
+  papel.transform.ry = 180;
+  const papel_1 = await factory.createFurniture("papeis_1", [roomInstance1.roomPosition[0]-35.0, roomInstance1.roomPosition[1]-14.5, roomInstance1.roomPosition[2]+25.0]);
+  papel_1.transform.ry = 180;
+  const papel_2 = await factory.createFurniture("papeis_2", [roomInstance1.roomPosition[0]-40.0, roomInstance1.roomPosition[1]-3.0, roomInstance1.roomPosition[2]+52.0]);
+  papel_2.transform.ry = 180;
+  const janela_bloqueio = await factory.createFurniture("janela_block", [roomInstance1.roomPosition[0]-58.0, roomInstance1.roomPosition[1]+7.0, roomInstance1.roomPosition[2]+23.0]);
+  janela_bloqueio.transform.ry = 90;
+
   window.dispatchEvent(new Event("gameLoaded"));
   
 
