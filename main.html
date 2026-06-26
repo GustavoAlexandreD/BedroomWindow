@@ -62,7 +62,7 @@
       vec3 ambient = 0.05 * baseColor.rgb;
 
       float diff = max(dot(normal, lightDir), 0.0);
-      float diffuseIntensity = 0.3s; 
+      float diffuseIntensity = 0.3; 
       vec3 diffuse = diff * u_lightColorDynamic * baseColor.rgb * att * diffuseIntensity;
 
       vec3 reflectDir = reflect(-lightDir, normal);
