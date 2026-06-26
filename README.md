@@ -282,8 +282,7 @@ http-server
 | Projeção Perspectiva | `src/utils/math.js` | ✅ |
 | Câmera 1ª Pessoa | `src/graphics/camera.js` | ✅ |
 | Iluminação Phong | Shaders em `src/graphics/renderer.js` | ✅ |
-| Luz Dinâmica | `src/graphics/room.js` | ✅ |
-| Objetos Animados | `src/models/animations.js` | ✅ |
+| Luz Dinâmica | `src/main.js` | ✅ |
 | Texturas 3D | `src/graphics/texture-loader.js` | ✅ |
 | Cores Sólidas | `src/graphics/room.js` | ✅ |
 | WebGL Puro | `src/graphics/renderer.js` | ✅ |
@@ -301,21 +300,15 @@ http-server
 
 ---
 
-## 📸 Screenshots
-
-[Adicionar screenshots do jogo aqui]
-
----
-
 ## 🎬 Vídeo de Demonstração
 
-[Link para vídeo demonstrando a execução do programa]
+https://drive.google.com/file/d/1sOQJAlIrpYy1lb1tw0Yso_u-DBFSA_Lo/view?usp=sharing
 
 ---
 
 ## 📖 Slides da Apresentação
 
-[Link para slides do projeto]
+https://docs.google.com/presentation/d/1tN1QRsyUdp6-_JC7-DeBhM9F5OQuFcaa/edit?usp=sharing&ouid=117358910944883236765&rtpof=true&sd=true
 
 ---
 
