@@ -306,12 +306,6 @@ https://drive.google.com/file/d/1sOQJAlIrpYy1lb1tw0Yso_u-DBFSA_Lo/view?usp=shari
 
 ---
 
-## 📖 Slides da Apresentação
-
-https://docs.google.com/presentation/d/1tN1QRsyUdp6-_JC7-DeBhM9F5OQuFcaa/edit?usp=sharing&ouid=117358910944883236765&rtpof=true&sd=true
-
----
-
 ## 📝 Notas Técnicas
 
 ### Tecnologias Utilizadas
