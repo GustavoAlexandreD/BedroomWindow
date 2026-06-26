@@ -50,20 +50,29 @@
     uniform sampler2D tex;
 
     void main() {
-      vec3 normal = normalize(v_normal);
+      vec4 baseColor = u_useTexture == 1 ? texture2D(tex, v_texCoord) : u_color;
 
-      // Apenas luz dinâmica (jogador) com raio limitado; ambiente é preto
+      vec3 normal = normalize(v_normal);
       vec3 lightDir = normalize(u_lightPosDynamic - v_fragPosition);
-      float diff = max(dot(normal, lightDir), 0.0);
+      vec3 viewDir = normalize(u_viewPosition - v_fragPosition);
+
       float dist = length(u_lightPosDynamic - v_fragPosition);
       float att = clamp(1.0 - dist / u_lightRadius, 0.0, 1.0);
 
-      // Luz final: difusa * cor * atenuação
-      vec3 diffuse = diff * u_lightColorDynamic * att;
+      vec3 ambient = 0.05 * baseColor.rgb;
 
-      vec4 baseColor = u_useTexture == 1 ? texture2D(tex, v_texCoord) : u_color;
-      // Multiplica pelo difuso; sem iluminação ambiente adicional
-      gl_FragColor = vec4(baseColor.rgb * diffuse, baseColor.a);
+      float diff = max(dot(normal, lightDir), 0.0);
+      float diffuseIntensity = 0.1; 
+      vec3 diffuse = diff * u_lightColorDynamic * baseColor.rgb * att * diffuseIntensity;
+
+      vec3 reflectDir = reflect(-lightDir, normal);
+      float shininess = 32.0; 
+      float specularIntensity = 0.1; 
+      
+      float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+      vec3 specular = spec * u_lightColorDynamic * att * specularIntensity;
+
+      gl_FragColor = vec4(ambient + diffuse + specular, baseColor.a);
     }
   </script>
 

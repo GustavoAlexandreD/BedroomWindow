@@ -644,9 +644,9 @@ function draw(time = 0) {
       );
       gl.uniform3f(
         gl.getUniformLocation(program, "u_viewPosition"),
-        0.0,
-        FIXED_CAMERA_HEIGHT,
-        0.0
+        camera.position[0],
+        camera.position[1],
+        camera.position[2]
       );
     }
 
